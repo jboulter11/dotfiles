@@ -1,0 +1,69 @@
+#
+# A single line theme with Git information on the left and Ruby on the right.
+#
+# Authors:
+#   Kyle West <kswest@gmail.com>
+#   Sorin Ionescu <sorin.ionescu@gmail.com>
+#
+# Features:
+#   - Indicates dirty Git repository.
+#   - Indicates the Ruby version.
+#   - Indicates vi modes.
+#
+# Screenshots:
+#   http://i.imgur.com/dCwhynn.png
+#
+
+function prompt_jim_precmd {
+  setopt LOCAL_OPTIONS
+  unsetopt XTRACE KSH_ARRAYS
+
+  # Get Git repository information.
+  if (( $+functions[git-info] )); then
+    git-info
+  fi
+
+  # Get Ruby information.
+  if (( $+functions[ruby-info] )); then
+    ruby-info
+  fi
+}
+
+function prompt_jim_setup {
+  setopt LOCAL_OPTIONS
+  unsetopt XTRACE KSH_ARRAYS
+  prompt_opts=(cr percent sp subst)
+
+  # Load required functions.
+  autoload -Uz add-zsh-hook
+
+  # Add hook for calling git-info before each command.
+  add-zsh-hook precmd prompt_jim_precmd
+
+  # Tell prezto we can manage this prompt
+  zstyle ':prezto:module:prompt' managed 'yes'
+
+  # Set editor-info parameters.
+  zstyle ':prezto:module:editor:info:completing' format '%B%F{cyan}...%f%b'
+  zstyle ':prezto:module:editor:info:keymap:primary' format "%B%F{207}❯%f%b "
+  zstyle ':prezto:module:editor:info:keymap:alternate' format "%B%F{green}❮%f%b "
+
+  # Set git-info parameters.
+  zstyle ':prezto:module:git:info' verbose 'no'
+  zstyle ':prezto:module:git:info:branch' format '%%B%F{207}@%b%f%%b'
+  zstyle ':prezto:module:git:info:dirty-branch' format '%%B%F{93}@%b%f%%b'
+  zstyle ':prezto:module:git:info:indexed' format ' '
+  zstyle ':prezto:module:git:info:unindexed' format ' '
+  zstyle ':prezto:module:git:info:untracked' format ' '
+  zstyle ':prezto:module:git:info:keys' format 'prompt' '%b'
+
+  # Set ruby-info parameters.
+  zstyle ':prezto:module:ruby:info:version' format '%F{blue}[%v]%f'
+
+  # Define prompts.
+  PROMPT='%B%F{207}%c%f${git_info:+${(e)git_info[prompt]}}${editor_info[keymap]}%b'
+  #RPROMPT='${ruby_info[version]}'
+}
+
+prompt_jim_setup "$@"
+# vim: ft=zsh
