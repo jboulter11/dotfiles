@@ -20,9 +20,13 @@ brew upgrade
 
 # Zshell
 brew install zsh
+chsh -s /bin/zsh
 
 # tmux
 brew install tmux
 
 # Fuzzy finder
 brew install fzf
+
+# swift-sh
+brew install swift-sh
