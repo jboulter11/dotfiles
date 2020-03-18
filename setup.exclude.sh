@@ -17,7 +17,7 @@ setup_file_system () {
 link () {
 	echo "This utility will symlink the files in this repo to the home directory"
 	if user_ack ; then
-		for file in $( ls -A | grep -vE '\.exclude*|\.git$|\.gitignore|.*.md' ) ; do
+		for file in $( ls -A | grep -vE '\.exclude*|\.git$|\.gitignore$|.*.md' ) ; do
 			ln -sv "$PWD/$file" "$HOME"
 		done
 		# TODO: source files here?
