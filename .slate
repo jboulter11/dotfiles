@@ -1,0 +1,7 @@
+bind 9:ctrl snapshot 2monitors save-to-disk
+bind 0:ctrl snapshot 1monitor save-to-disk
+bind 1:ctrl activate-snapshot 2monitors save-to-disk
+bind 2:ctrl activate-snapshot 1monitor save-to-disk
+
+default 2monitors count:2
+default 1monitor count:1
