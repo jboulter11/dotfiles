@@ -15,7 +15,7 @@ export VISUAL=/usr/bin/vim
 
 autoload -Uz promptinit
 promptinit
-prompt jim
+prompt sorin
 
 # Customize to your needs...
 ##Start env config
@@ -24,13 +24,15 @@ export TERM=xterm-256color
 
 #Aliases
 alias gst='git status'
-alias gco='git checkout'
+#alias gco='git checkout'
 alias gpl='git pull'
 alias gb='git branch'
 alias gac='git add .; git commit -m'
 alias gd='git diff'
 alias gpr='git pr'
 alias pi='pod install'
+
+source ~/.dropboxrc
 
 #Functions
 function cd {
@@ -39,6 +41,22 @@ function cd {
 
 function simVideo() {
   xcrun simctl io booted recordVideo "$@"
+}
+
+function gco() {
+  if [[ $1 =~ ^- ]]; then
+    checkoutWithOptions $@
+  else
+    checkoutWithOptions "" $@
+  fi
+}
+
+function checkoutWithOptions() {
+  if [[ "$2" == "master" ]]; then
+    git checkout $@
+  else
+    git checkout $1 "dbapp-ios/jboulter/$2"
+  fi
 }
 
 function gp() {
@@ -118,3 +136,6 @@ function incognito() {
 }
 
 [ -f ~/.fzf.zsh ] && source ~/.fzf.zsh
+
+# To customize prompt, run `p10k configure` or edit ~/.p10k.zsh.
+[[ ! -f ~/.p10k.zsh ]] || source ~/.p10k.zsh

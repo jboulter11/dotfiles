@@ -1,0 +1,6 @@
+alias db='cd ~/code/xplat/'
+alias dbmake='./submodule_update.sh && make project_dbapp && open buck-out/gen/dbapp-ios/Dropbox/Dropbox.xcodeproj'
+alias dbtags='git for-each-ref --shell --sort=creatordate --format="%(refname:short) ->  %(creatordate:format:%x ~ %X %z)" | grep dbapp-ios/'
+
+PATH=$PATH:~/code/xplat/tools/buck/bin/
+PATH=$PATH:~/code/GitChildBranchHelpers/bin/
