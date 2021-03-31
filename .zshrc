@@ -139,6 +139,4 @@ function incognito() {
 # From repo_setup:
 export PYENV_ROOT="$HOME/.pyenv"
 eval "$(pyenv init -)"
-
-# From repo_setup:
 export JAVA_HOME="/Library/Java/JavaVirtualMachines/jdk1.8.0_172.jdk/Contents/Home"
