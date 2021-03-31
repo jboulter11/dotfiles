@@ -20,12 +20,22 @@ link () {
 		for file in $( ls -A | grep -vE '\.exclude*|\.git$|\.gitignore$|.*.md' ) ; do
 			ln -sv "$PWD/$file" "$HOME"
 		done
-		# TODO: source files here?
+
+  		# TODO: source files here?
 		echo "Symlinking complete"
 	else
 		echo "Symlinking cancelled by user"
 		return 1
 	fi
+}
+
+vim_theme() {
+    # Copy Vim color scheme
+    # Symlinking doesn't seem to work for this
+    mkdir "$HOME/.vim"
+    mkdir "$HOME/.vim/colors"
+    cp  "monokai.exclude.vim" "$HOME/.vim/colors/monokai.vim"
+
 }
 
 install_tools () {
@@ -54,5 +64,6 @@ install_zprezto () {
 
 setup_file_system
 link
+vim_theme
 install_tools
 
