@@ -118,6 +118,10 @@ function zipArchive() {
 # altool
 PATH=$PATH:/Applications/Xcode.app/Contents/Applications/Application\ Loader.app/Contents/Frameworks/ITunesSoftwareService.framework/Support/
 
+function killCoreAudio() {
+    sudo launchctl stop com.apple.audio.coreaudiod && sudo launchctl start com.apple.audio.coreaudiod
+}
+
 # Chrome
 funciton chrome() {
   open -na "Google Chrome" --args $@
@@ -131,3 +135,10 @@ function incognito() {
 
 # To customize prompt, run `p10k configure` or edit ~/.p10k.zsh.
 [[ ! -f ~/.p10k.zsh ]] || source ~/.p10k.zsh
+
+# From repo_setup:
+export PYENV_ROOT="$HOME/.pyenv"
+eval "$(pyenv init -)"
+
+# From repo_setup:
+export JAVA_HOME="/Library/Java/JavaVirtualMachines/jdk1.8.0_172.jdk/Contents/Home"

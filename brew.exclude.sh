@@ -27,6 +27,7 @@ brew install tmux
 
 # Fuzzy finder
 brew install fzf
+$(brew --prefix)/opt/fzf/install
 
 # swift-sh
 brew install swift-sh
