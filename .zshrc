@@ -16,13 +16,14 @@ export TERM=xterm-256color
 
 #Aliases
 alias gst='git status'
-#alias gco='git checkout'
 alias gpl='git pull'
 alias gb='git branch'
 alias gac='git add .; git commit -m'
 alias gd='git diff'
 alias gpr='git pr'
 alias pi='pod install'
+
+alias rmdd='rm -rf $HOME/Library/Developer/Xcode/DerivedData'
 
 source ~/.dropboxrc
 
@@ -133,10 +134,10 @@ function incognito() {
 
 [ -f ~/.fzf.zsh ] && source ~/.fzf.zsh
 
-# To customize prompt, run `p10k configure` or edit ~/.p10k.zsh.
-[[ ! -f ~/.p10k.zsh ]] || source ~/.p10k.zsh
-
 # From repo_setup:
 export PYENV_ROOT="$HOME/.pyenv"
 eval "$(pyenv init -)"
 export JAVA_HOME="/Library/Java/JavaVirtualMachines/jdk1.8.0_172.jdk/Contents/Home"
+
+# From repo_setup:
+eval "$(pyenv init -)"

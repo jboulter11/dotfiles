@@ -3,5 +3,27 @@ alias dbmake='./submodule_update.sh && make project_dbapp && open buck-out/gen/d
 alias cupmake='./submodule_update.sh && make project_cup && open buck-out/gen/ios/cup/app/Cup.xcodeproj/project.xcworkspace'
 alias dbtags='git for-each-ref --shell --sort=creatordate --format="%(refname:short) ->  %(creatordate:format:%x ~ %X %z)" | grep dbapp-ios/'
 
+alias arcpaste='git diff master | arc paste --'
+alias mkbuild='arc test xplat_dbapp_ios_and_upload_vm'
+
+alias gen='./ios_gen_module_project -o'
+
+function b() {
+    BUCK_PATH="$(buck root)"
+    MY_PATH="$(pwd)"
+    TARGET_PATH="/${MY_PATH#$BUCK_PATH}"
+    BUILD_PATH=$TARGET_PATH$1
+    echo "$BUILD_PATH"
+    buck build "$BUILD_PATH"
+}
+
+function vv() {
+    buck query "attrfilter('module_name', '$1', '//...')" | tail -1
+}
+
+function af() {
+    swift sh ~/.addFileToModule.swift
+}
+
 PATH=$PATH:~/code/xplat/tools/buck/bin/
 PATH=$PATH:~/code/GitChildBranchHelpers/bin/
