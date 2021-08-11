@@ -23,7 +23,7 @@ function vv() {
 
 function af() {
     pushd ~/code/xplat
-    swift sh .addFileToModule.swift
+    add_swift_file_to_buck_module %@
     popd
 }
 
