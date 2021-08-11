@@ -22,7 +22,9 @@ function vv() {
 }
 
 function af() {
-    swift sh ~/.addFileToModule.swift
+    pushd ~/code/xplat
+    swift sh .addFileToModule.swift
+    popd
 }
 
 PATH=$PATH:~/code/xplat/tools/buck/bin/
