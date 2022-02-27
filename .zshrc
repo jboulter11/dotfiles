@@ -132,6 +132,17 @@ function incognito() {
   open -na "Google Chrome" --args --incognito $@
 }
 
+function mkBuck() {
+    echo "load(\"//BuckRules:buck_rule_macros.bzl\", \"first_party_lib\")\n\n" >| "$1/BUCK"
+    vim $1/BUCK
+}
+
+function buckproj() {
+    output=$(buck project --combined-project --without-dependencies-tests --show-output $@)
+    file=$(echo $output | sed -En 's/^.*(buck\-out\/gen\/.+)$/\1/p')
+    open $file
+}
+
 [ -f ~/.fzf.zsh ] && source ~/.fzf.zsh
 
 # From repo_setup:
