@@ -62,10 +62,23 @@ install_zprezto () {
     fi
 }
 
+all () {
+    install_zprezto
+    setup_file_system
+    link
+    vim_theme
+    install_tools
+}
+
 menu () {
-    echo -ne "
-    $green'1)'$clear Option 1
-    "
+    echo "
+    $BBlue 1) $Reset Install zprezto
+    $BBlue 2) $Reset Setup file system
+    $BBlue 3) $Reset Symlink dotfiles
+    $BBlue 4) $Reset Install vim theme
+    $BBlue 5) $Reset Install brew packages
+    $BGreen 6) $Reset All
+    $BRed 0) $Reset Exit"
     read a
     case $a in
         1) install_zprezto ; menu ;;
@@ -74,7 +87,8 @@ menu () {
         4) vim_theme ; menu ;;
         5) install_tools ; menu ;;
         6) all ; menu ;;
-        *) echo -e $red"Bad selection"$clear;
+        0) exit ;;
+        *) echo "$BRed Bad selection$Reset" ;
     esac
 }
 
