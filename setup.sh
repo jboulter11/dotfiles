@@ -12,7 +12,6 @@ setup_file_system () {
 }
 
 # TODO : Delete symlinks to deleted files
-# Is this where rsync shines?
 # TODO - add support for -f and --force
 link () {
 	echo "This utility will symlink the files in this repo to the home directory"
@@ -93,3 +92,4 @@ menu () {
 }
 
 menu
+# TODO: Install apps too
