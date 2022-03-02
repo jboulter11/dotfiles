@@ -18,7 +18,7 @@ link () {
 	echo "This utility will symlink the files in this repo to the home directory"
 	if user_ack ; then
 		for file in $( ls -A symlinked_to_home/ ) ; do
-			ln -sv "$PWD/$file" "$HOME"
+			ln -sv "$PWD/symlinked_to_home/$file" "$HOME"
 		done
 
   		# TODO: source files here?
@@ -43,7 +43,7 @@ install_tools () {
 		echo "This utility will install useful utilities using Homebrew"
 		if user_ack ; then
 			echo "Installing useful stuff using brew. This may take a while..."
-			sh brew.exclude.sh
+			sh brew.sh
 		else
 			echo "Brew installation cancelled by user"
 		fi
@@ -56,14 +56,26 @@ install_zprezto () {
     echo "This utility will install zprezto, install and set jim prompt"
     if user_ack ; then
         echo "Installing zprezto and setting prompt."
-        zsh zprezto.exclude.sh
+        zsh zprezto.sh
     else
         echo "zprezto installation cancelled by user"
     fi
 }
 
-setup_file_system
-link
-vim_theme
-install_tools
+menu () {
+    echo -ne "
+    $green'1)'$clear Option 1
+    "
+    read a
+    case $a in
+        1) install_zprezto ; menu ;;
+        2) setup_file_system ; menu ;;
+        3) link ; menu ;;
+        4) vim_theme ; menu ;;
+        5) install_tools ; menu ;;
+        6) all ; menu ;;
+        *) echo -e $red"Bad selection"$clear;
+    esac
+}
 
+menu

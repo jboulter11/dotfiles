@@ -31,3 +31,6 @@ $(brew --prefix)/opt/fzf/install
 
 # swift-sh
 brew install swift-sh
+
+# ripgrep
+brew install ripgrep

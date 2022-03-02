@@ -38,12 +38,12 @@ function prompt_jim_setup {
 
   # Set editor-info parameters.
   zstyle ':prezto:module:editor:info:completing' format '%B%F{cyan}...%f%b'
-  zstyle ':prezto:module:editor:info:keymap:primary' format "%B%F{207}❯%f%b "
-  zstyle ':prezto:module:editor:info:keymap:alternate' format "%B%F{green}❮%f%b "
+  zstyle ':prezto:module:editor:info:keymap:primary' format "%B%F{1}❯%f%F{2}❯%f%F{3}❯%f%b "
+  zstyle ':prezto:module:editor:info:keymap:alternate' format "%B%F{2}❮%f%F{3}❮%f%F{1}❮%f%b "
 
   # Set git-info parameters.
   zstyle ':prezto:module:git:info' verbose 'no'
-  zstyle ':prezto:module:git:info:branch' format '%%B%F{207}@%b%f%%b'
+  zstyle ':prezto:module:git:info:branch' format '%%B%F{73}@%b%f%%b'
   zstyle ':prezto:module:git:info:dirty-branch' format '%%B%F{93}@%b%f%%b'
   zstyle ':prezto:module:git:info:indexed' format ' '
   zstyle ':prezto:module:git:info:unindexed' format ' '
@@ -51,7 +51,7 @@ function prompt_jim_setup {
   zstyle ':prezto:module:git:info:keys' format 'prompt' '%b'
 
   # Define prompts.
-  PROMPT='%B%F{207}%c%f${git_info:+${(e)git_info[prompt]}}${editor_info[keymap]}%b'
+  PROMPT='%B%F{73}%c%f${git_info:+${(e)git_info[prompt]}}${editor_info[keymap]}%b'
   RPROMPT=''
 }
 
