@@ -50,6 +50,7 @@ set term=xterm-256color
 syntax on
 colorscheme monokai
 
+set number
 set background=dark
 set tabstop=4
 set shiftwidth=4

@@ -1,5 +1,5 @@
 #!/bin/sh
-source "${BASH_SOURCE%/*}/utilities.exclude.sh"
+source "${BASH_SOURCE%/*}/utilities.sh"
 
 # Setup FS
 setup_file_system () {
@@ -17,7 +17,7 @@ setup_file_system () {
 link () {
 	echo "This utility will symlink the files in this repo to the home directory"
 	if user_ack ; then
-		for file in $( ls -A | grep -vE '\.exclude*|\.git$|\.gitignore$|.*.md' ) ; do
+		for file in $( ls -A symlinked_to_home/ ) ; do
 			ln -sv "$PWD/$file" "$HOME"
 		done
 
@@ -34,7 +34,7 @@ vim_theme() {
     # Symlinking doesn't seem to work for this
     mkdir "$HOME/.vim"
     mkdir "$HOME/.vim/colors"
-    cp  "monokai.exclude.vim" "$HOME/.vim/colors/monokai.vim"
+    cp  "../monokai.vim" "$HOME/.vim/colors/monokai.vim"
 
 }
 
