@@ -12,25 +12,22 @@ if [ ! "$?" -eq 0 ] ; then
 	fi
 fi
 
+pushd /Applications && curl http://www.ninjamonkeysoftware.com/slate/versions/slate-latest.tar.gz | tar -xz ; popd
+
 # Make sure we’re using the latest Homebrew
 brew update
 
 # Upgrade any already-installed formulae
 brew upgrade
 
-# Zshell
+# Install
 brew install zsh
-chsh -s /bin/zsh
-
-# tmux
 brew install tmux
-
-# Fuzzy finder
 brew install fzf
-$(brew --prefix)/opt/fzf/install
-
-# swift-sh
 brew install swift-sh
-
-# ripgrep
 brew install ripgrep
+brew install pyenv
+brew install robotsandpencils/made/xcodes
+sudo xcode-select --install
+$(brew --prefix)/opt/fzf/install
+chsh -s /bin/zsh

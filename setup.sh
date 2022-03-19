@@ -33,8 +33,9 @@ vim_theme() {
     # Symlinking doesn't seem to work for this
     mkdir "$HOME/.vim"
     mkdir "$HOME/.vim/colors"
-    cp  "../monokai.vim" "$HOME/.vim/colors/monokai.vim"
-
+    cp  "monokai.vim" "$HOME/.vim/colors/monokai.vim"
+    git clone https://github.com/VundleVim/Vundle.vim.git ~/.vim/bundle/Vundle.vim
+    vim +PluginInstall +qall
 }
 
 install_tools () {
