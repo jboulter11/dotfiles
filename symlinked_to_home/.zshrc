@@ -7,7 +7,7 @@ export VISUAL=/usr/bin/vim
 
 autoload -Uz promptinit
 promptinit
-prompt jim
+prompt sorin
 
 # Customize to your needs...
 ##Start env config
