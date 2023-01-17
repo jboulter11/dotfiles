@@ -6,13 +6,13 @@
 which brew 1>&/dev/null
 if [ ! "$?" -eq 0 ] ; then
 	echo "Homebrew not installed. Attempting to install Homebrew"
-	/usr/bin/ruby -e "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install)"
+    /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
 	if [ ! "$?" -eq 0 ] ; then
 		echo "Something went wrong. Exiting..." && exit 1
 	fi
 fi
 
-pushd /Applications && curl http://www.ninjamonkeysoftware.com/slate/versions/slate-latest.tar.gz | tar -xz ; popd
+pushd /Applications && curl http://www.ninjamonkeysoftware.com/slate/versions/slate-latest.tar.gz | tar -xz ; popd || exit
 
 # Make sure we’re using the latest Homebrew
 brew update
@@ -45,10 +45,11 @@ brew install --cask paw
 brew install --cask bettertouchtool
 brew install --cask meetingbar
 brew install --cask db-browser-for-sqlite
+brew install --cask karabiner-elements
 
 # xcode commandline tools
 sudo xcode-select --install
 
 # install fzf completions
-$(brew --prefix)/opt/fzf/install
+"$(brew --prefix)"/opt/fzf/install
 
