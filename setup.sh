@@ -60,6 +60,8 @@ install_zprezto () {
     else
         echo "zprezto installation cancelled by user"
     fi
+
+    chsh -s /bin/zsh
 }
 
 all () {

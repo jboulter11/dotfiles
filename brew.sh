@@ -28,6 +28,13 @@ brew install swift-sh
 brew install ripgrep
 brew install pyenv
 brew install robotsandpencils/made/xcodes
+brew install --cask alfred
+
+
+# xcode commanline tools
 sudo xcode-select --install
+
+# install fzf completions
 $(brew --prefix)/opt/fzf/install
-chsh -s /bin/zsh
+
+# change shell to zsh
