@@ -31,8 +31,22 @@ brew install sourcery
 brew install rbenv
 brew install shellcheck
 brew install socat
+brew install --cask setapp
+brew install --cask sim-genie
+brew install --cask 1password
+brew install --cask iterm2
+brew install --cask visual-studio-code
+brew install --cask deckset
+brew install --cask roon
+brew install --cask loopback
+brew install --cask reveal
+brew install --cask nslogger
+brew install --cask paw
+brew install --cask bettertouchtool
+brew install --cask meetingbar
+brew install --cask db-browser-for-sqlite
 
-# xcode commanline tools
+# xcode commandline tools
 sudo xcode-select --install
 
 # install fzf completions
