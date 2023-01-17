@@ -17,9 +17,6 @@ pushd /Applications && curl http://www.ninjamonkeysoftware.com/slate/versions/sl
 # Make sure we’re using the latest Homebrew
 brew update
 
-# Upgrade any already-installed formulae
-brew upgrade
-
 # Install
 brew install zsh
 brew install tmux
@@ -29,7 +26,11 @@ brew install ripgrep
 brew install pyenv
 brew install robotsandpencils/made/xcodes
 brew install --cask alfred
-
+brew install fd
+brew install sourcery
+brew install rbenv
+brew install shellcheck
+brew install socat
 
 # xcode commanline tools
 sudo xcode-select --install
@@ -37,4 +38,3 @@ sudo xcode-select --install
 # install fzf completions
 $(brew --prefix)/opt/fzf/install
 
-# change shell to zsh
