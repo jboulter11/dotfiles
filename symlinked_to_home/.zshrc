@@ -22,6 +22,11 @@ alias gac='git add .; git commit -m'
 alias gd='git diff'
 alias gpr='git pr'
 alias pi='pod install'
+alias gfm='git fetch origin master:master'
+alias gfmr='gfm && git rebase master'
+alias grc='git rebase --continue'
+alias ga.='git add .'
+alias garc='git add .; git rebase --continue'
 
 alias rmdd='rm -rf $HOME/Library/Developer/Xcode/DerivedData'
 
@@ -124,7 +129,7 @@ function killCoreAudio() {
 }
 
 # Chrome
-funciton chrome() {
+function chrome() {
   open -na "Google Chrome" --args $@
 }
 
@@ -145,10 +150,29 @@ function buckproj() {
 
 [ -f ~/.fzf.zsh ] && source ~/.fzf.zsh
 
-# From repo_setup:
-export PYENV_ROOT="$HOME/.pyenv"
+#from repo_setup
+export JAVA_HOME="/Library/Java/JavaVirtualMachines/zulu-11.jdk/Contents/Home"
 eval "$(pyenv init -)"
-export JAVA_HOME="/Library/Java/JavaVirtualMachines/jdk1.8.0_172.jdk/Contents/Home"
+export PYENV_ROOT="$HOME/.pyenv"
+export PATH="$HOME/.pyenv/shims:$PATH"
+
 
 # From repo_setup:
-eval "$(pyenv init -)"
+export ANDROID_HOME="/Users/jboulter/Library/Android/sdk"
+export ANDROID_NDK_HOME="/Users/jboulter/Library/Android/ndk"
+export ANDROID_NDK="/Users/jboulter/Library/Android/ndk"
+export PATH="/Users/jboulter/Library/Android/sdk/platform-tools:/Users/jboulter/Library/Android/sdk/tools:/Users/jboulter/Library/Android/ndk:$PATH"
+
+# rbenv
+eval "$(rbenv init - zsh)"
+
+
+# load tooldir completions
+fpath=(~/.zsh/completion $fpath)
+autoload -U compinit
+compinit
+
+export PATH="/usr/local/opt/php@7.4/bin:$PATH"
+export PATH="/usr/local/opt/php@7.4/sbin:$PATH"
+export PATH="/usr/local/homebrew/sbin:$PATH"
+

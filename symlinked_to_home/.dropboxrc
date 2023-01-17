@@ -1,4 +1,5 @@
 alias db='cd ~/code/xplat/'
+alias db2='cd ~/code/xplat2/'
 alias dbmake='./submodule_update.sh && make project_dbapp && open buck-out/gen/dbapp-ios/Dropbox/Dropbox.xcodeproj'
 alias cupmake='./submodule_update.sh && make project_cup && open buck-out/gen/ios/cup/app/Cup.xcodeproj/project.xcworkspace'
 alias dbtags='git for-each-ref --shell --sort=creatordate --format="%(refname:short) ->  %(creatordate:format:%x ~ %X %z)" | grep dbapp-ios/'
@@ -7,6 +8,7 @@ alias arcpaste='git diff master | arc paste --'
 alias mkbuild='arc test xplat_dbapp_ios_and_upload_vm'
 
 alias gen='./ios_gen_module_project -o'
+alias td='./td'
 
 function b() {
     BUCK_PATH="$(buck root)"
@@ -27,5 +29,6 @@ function af() {
     popd
 }
 
+alias buck='tools/buck/bin/buck'
 PATH=$PATH:~/code/xplat/tools/buck/bin/
 PATH=$PATH:~/code/GitChildBranchHelpers/bin/

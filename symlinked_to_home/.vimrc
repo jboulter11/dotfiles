@@ -55,6 +55,7 @@ set background=dark
 set tabstop=4
 set shiftwidth=4
 set expandtab
+set number
 
 let g:syntastic_swift_checkers = ['swiftpm', 'swiftlint']
 set statusline+=%#warningmsg#
