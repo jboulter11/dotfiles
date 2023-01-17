@@ -53,15 +53,35 @@ install_tools () {
 }
 
 install_zprezto () {
-    echo "This utility will install zprezto, install and set jim prompt"
+    echo "This utility will install zprezto, set zsh as default and set jim prompt"
     if user_ack ; then
         echo "Installing zprezto and setting prompt."
         zsh zprezto.sh
+        
+        echo "Setting zsh as default shell."
+        chsh -s /bin/zsh
     else
         echo "zprezto installation cancelled by user"
     fi
+}
 
-    chsh -s /bin/zsh
+colemak () {
+    echo "This utility will install colemak mod-dh keyboard layout"
+    if user_ack ; then
+        echo "Installing colemak."
+        pushd ~/code/
+        git clone https://github.com/ColemakMods/mod-dh.git
+        popd
+
+        pushd ~/code/mod-dh/macOS
+        cp Colemak\ DH.bundle /Library/Keyboard\ Layouts/Colemak\ DH.bundle
+        popd
+
+        echo "Please logout and login, if needed go to SysPref > Keyboard > Input Sources and enable the keyboard"
+        
+    else
+        echo "colemake install cancelled by user"
+    fi
 }
 
 all () {
@@ -70,6 +90,7 @@ all () {
     link
     vim_theme
     install_tools
+    colemak
 }
 
 menu () {
@@ -79,7 +100,8 @@ menu () {
     $BBlue 3) $Reset Symlink dotfiles
     $BBlue 4) $Reset Install vim theme
     $BBlue 5) $Reset Install brew packages
-    $BGreen 6) $Reset All
+    $BBlue 6) $Reset Install Colemak Mod-dh
+    $BGreen 7) $Reset All
     $BRed 0) $Reset Exit"
     read a
     case $a in
@@ -88,7 +110,8 @@ menu () {
         3) link ; menu ;;
         4) vim_theme ; menu ;;
         5) install_tools ; menu ;;
-        6) all ; menu ;;
+        6) colemak ; menu ;;
+        7) all ; menu ;;
         0) exit ;;
         *) echo "$BRed Bad selection$Reset" ;
     esac
