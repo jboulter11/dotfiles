@@ -13,6 +13,8 @@ if [ ! "$?" -eq 0 ] ; then
 	fi
 fi
 
+git -C $(brew --repo homebrew/core) checkout master
+
 pushd /Applications && curl http://www.ninjamonkeysoftware.com/slate/versions/slate-latest.tar.gz | tar -xz ; popd || exit
 
 # Make sure we’re using the latest Homebrew
