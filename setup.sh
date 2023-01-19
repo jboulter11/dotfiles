@@ -5,7 +5,7 @@ source "${BASH_SOURCE%/*}/utilities.sh"
 setup_file_system () {
 	pushd ~
     # Create code directory
-	mkdir ~/code
+	mkdir ~/src
     # clone notes repository to create notes directory
 	git clone https://github.com/jboulter11/notes
 	popd
@@ -69,12 +69,12 @@ colemak () {
     echo "This utility will install colemak mod-dh keyboard layout"
     if user_ack ; then
         echo "Installing colemak."
-        pushd ~/code/
+        pushd ~/src/
         git clone https://github.com/ColemakMods/mod-dh.git
         popd
 
-        pushd ~/code/mod-dh/macOS
-        cp Colemak\ DH.bundle /Library/Keyboard\ Layouts/Colemak\ DH.bundle
+        pushd ~/src/mod-dh/macOS
+        sudo cp -r Colemak\ DH.bundle /Library/Keyboard\ Layouts/Colemak\ DH.bundle
         popd
 
         echo "Please logout and login, if needed go to SysPref > Keyboard > Input Sources and enable the keyboard"
