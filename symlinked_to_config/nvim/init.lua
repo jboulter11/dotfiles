@@ -233,6 +233,14 @@ require("lazy").setup({
       },
     },
   },
+  {
+    "m4xshen/autoclose.nvim",
+    opts = {
+      options = {
+        pair_spaces = true,
+      },
+    },
+  },
 }, {})
 
 -- [[ Setting options ]]
