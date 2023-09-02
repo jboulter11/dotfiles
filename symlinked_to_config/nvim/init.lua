@@ -208,6 +208,7 @@ require("lazy").setup({
 
   {
     -- Cute icons
+    -- If these don't work it's because you're not using the patched font in your dropbox
     "nvim-tree/nvim-web-devicons",
   },
 }, {})
