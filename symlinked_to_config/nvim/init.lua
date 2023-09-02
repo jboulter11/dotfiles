@@ -2,6 +2,7 @@
 -- Jim Boulter's nvim config.
 -- Originally setup with kickstart.nvim
 --]]
+
 -- Set <space> as the leader key
 -- See `:help mapleader`
 --  NOTE: Must happen before plugins are required (otherwise wrong leader will be used)
@@ -215,6 +216,22 @@ require("lazy").setup({
   {
     "folke/trouble.nvim",
     dependencies = { "nvim-tree/nvim-web-devicons" },
+  },
+  {
+    "nvim-neo-tree/neo-tree.nvim",
+    branch = "v3.x",
+    dependencies = {
+      "nvim-lua/plenary.nvim",
+      "nvim-tree/nvim-web-devicons", -- not strictly required, but recommended
+      "MunifTanjim/nui.nvim",
+    },
+    opts = {
+      close_if_last_window = true,
+      auto_clean_after_session_restore = true,
+      window = {
+        ["t"] = nil,
+      },
+    },
   },
 }, {})
 
@@ -548,6 +565,13 @@ cmp.setup {
     { name = "luasnip" },
   },
 }
+
+-- [[ Configure neo-tree ]]
+-- See `:help neo-tree`
+
+vim.keymap.set("n", "<leader>tf", "<Cmd>Neotree<CR>", { desc = "Neo[T]ree [F]ilesystem" })
+vim.keymap.set("n", "<leader>tg", "<Cmd>Neotree<CR>", { desc = "Neo[T]ree [G]it Status" })
+
 
 -- The line beneath this is called `modeline`. See `:help modeline`
 -- vim: ts=2 sts=2 sw=2 et
