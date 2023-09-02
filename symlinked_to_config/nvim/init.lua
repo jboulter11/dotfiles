@@ -211,6 +211,11 @@ require("lazy").setup({
     -- If these don't work it's because you're not using the patched font in your dropbox
     "nvim-tree/nvim-web-devicons",
   },
+
+  {
+    "folke/trouble.nvim",
+    dependencies = { "nvim-tree/nvim-web-devicons" },
+  },
 }, {})
 
 -- [[ Setting options ]]
@@ -385,10 +390,15 @@ require("nvim-treesitter.configs").setup {
 }
 
 -- Diagnostic keymaps
-vim.keymap.set("n", "[d", vim.diagnostic.goto_prev, { desc = "Go to previous diagnostic message" })
-vim.keymap.set("n", "]d", vim.diagnostic.goto_next, { desc = "Go to next diagnostic message" })
-vim.keymap.set("n", "<leader>e", vim.diagnostic.open_float, { desc = "Open floating diagnostic message" })
-vim.keymap.set("n", "<leader>q", vim.diagnostic.setloclist, { desc = "Open diagnostics list" })
+-- vim.keymap.set("n", "[d", vim.diagnostic.goto_prev, { desc = "Go to previous diagnostic message" })
+-- vim.keymap.set("n", "]d", vim.diagnostic.goto_next, { desc = "Go to next diagnostic message" })
+-- vim.keymap.set("n", "<leader>e", vim.diagnostic.open_float, { desc = "Open floating diagnostic message" })
+-- vim.keymap.set("n", "<leader>q", vim.diagnostic.setloclist, { desc = "Open diagnostics list" })
+vim.keymap.set("n", "<leader>tt", "<Cmd>TroubleToggle document_diagnostics<CR>", { desc = "[T]rouble [T]oggle" })
+vim.keymap.set("n", "<leader>tw", "<Cmd>TroubleToggle workspace_diagnostics<CR>", { desc = "[T]rouble [T]oggle" })
+vim.keymap.set("n", "<leader>tq", "<Cmd>TroubleToggle quickfix<CR>", { desc = "[T]rouble [Q]uickfix" })
+vim.keymap.set("n", "<leader>tn", function() require("trouble").next({skip_groups = true, jump = true }) end, { desc = "[T]rouble [N]ext" })
+vim.keymap.set("n", "<leader>tp", function() require("trouble").next({skip_groups = true, jump = true }) end, { desc = "[T]rouble [P]revious" })
 
 -- [[ Configure LSP ]]
 --  This function gets run when an LSP connects to a particular buffer.
