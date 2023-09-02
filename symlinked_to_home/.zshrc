@@ -20,7 +20,6 @@ alias gpl='git pull'
 alias gb='git branch'
 alias gac='git add .; git commit -m'
 alias gd='git diff'
-alias gpr='git pr'
 alias pi='pod install'
 alias gfm='git fetch origin master:master'
 alias gfmr='gfm && git rebase master'
@@ -150,13 +149,6 @@ function buckproj() {
 
 [ -f ~/.fzf.zsh ] && source ~/.fzf.zsh
 
-#from repo_setup
-export JAVA_HOME="/Library/Java/JavaVirtualMachines/zulu-11.jdk/Contents/Home"
-eval "$(pyenv init -)"
-export PYENV_ROOT="$HOME/.pyenv"
-export PATH="$HOME/.pyenv/shims:$PATH"
-
-
 # From repo_setup:
 export ANDROID_HOME="/Users/jboulter/Library/Android/sdk"
 export ANDROID_NDK_HOME="/Users/jboulter/Library/Android/ndk"
@@ -166,14 +158,22 @@ export PATH="/Users/jboulter/Library/Android/sdk/platform-tools:/Users/jboulter/
 # rbenv
 eval "$(rbenv init - zsh)"
 
-
-# load tooldir completions
-fpath=(~/.zsh/completion $fpath)
-autoload -U compinit
-compinit
-
+# intel
 export PATH="/usr/local/opt/php@7.4/bin:$PATH"
 export PATH="/usr/local/opt/php@7.4/sbin:$PATH"
 export PATH="/usr/local/homebrew/sbin:$PATH"
 
+# m1
+export PATH="/opt/homebrew/opt/php@7.4/bin:$PATH"
+export PATH="/opt/homebrew/opt/php@7.4/sbin:$PATH"
+
 eval "$(/opt/homebrew/bin/brew shellenv)"
+# From repo_setup:
+export JAVA_HOME="/Users/jboulter/.dbx_jdk/zulu17.42.19-ca-jdk17.0.7-macosx_aarch64"
+# From repo_setup:
+export PATH="$HOME/.pyenv/shims:$PATH"
+alias td="./td"
+# load tooldir completions
+fpath+=(~/.zsh/completion)
+autoload -U compinit
+compinit

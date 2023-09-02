@@ -37,6 +37,7 @@ brew install socat
 brew install --cask setapp
 brew install --cask sim-genie
 brew install --cask 1password
+brew install --cask 1password/tap/1password-cli
 brew install --cask iterm2
 brew install --cask visual-studio-code
 brew install --cask deckset

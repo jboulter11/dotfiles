@@ -1,14 +1,18 @@
 #!/bin/sh
-source "${BASH_SOURCE%/*}/utilities.sh"
+
+SCRIPT_PATH="$(readlink -f "$0")"
+BASE_DIR="$(dirname "$SCRIPT_PATH")"
+
+source "$BASE_DIR/utilities.sh"
 
 # Setup FS
 setup_file_system () {
-	pushd ~
+	pushd ~ || exit 1
     # Create code directory
 	mkdir ~/src
     # clone notes repository to create notes directory
 	git clone https://github.com/jboulter11/notes
-	popd
+	popd || exit 1
 }
 
 # TODO : Delete symlinks to deleted files
@@ -17,10 +21,9 @@ link () {
 	echo "This utility will symlink the files in this repo to the home directory"
 	if user_ack ; then
 		for file in $( ls -A symlinked_to_home/ ) ; do
-			ln -sv "$PWD/symlinked_to_home/$file" "$HOME"
+			ln -sv "$BASE_DIR/symlinked_to_home/$file" "$HOME"
 		done
 
-  		# TODO: source files here?
 		echo "Symlinking complete"
 	else
 		echo "Symlinking cancelled by user"
@@ -28,7 +31,7 @@ link () {
 	fi
 }
 
-vim_theme() {
+editor_themes() {
     # Copy Vim color scheme
     # Symlinking doesn't seem to work for this
     mkdir "$HOME/.vim"
@@ -36,10 +39,25 @@ vim_theme() {
     cp  "monokai.vim" "$HOME/.vim/colors/monokai.vim"
     git clone https://github.com/VundleVim/Vundle.vim.git ~/.vim/bundle/Vundle.vim
     vim +PluginInstall +qall
+    
+    # xcode themes
+    THEME_DIR="$HOME/Library/Developer/Xcode/UserData/FontAndColorThemes/"
+
+    if [ -d ~/Library/Developer/Xcode ]
+    then
+        echo "> Xcode detected. ✅"
+        echo "> Copying themes ..."
+        mkdir -p $THEME_DIR
+        cp "$BASE_DIR/xcode_themes/*.xccolortheme" "$THEME_DIR"
+        echo "> Done!"
+        echo "> You can restart Xcode now."
+    else
+        echo "Xcode doesn't seem to be installed on your computer. 🚨"
+    fi
 }
 
 install_tools () {
-	if [ $( echo "$OSTYPE" | grep 'darwin' ) ] ; then
+	if [ "$( echo "$OSTYPE" | grep 'darwin' )" ] ; then
 		echo "This utility will install useful utilities using Homebrew"
 		if user_ack ; then
 			echo "Installing useful stuff using brew. This may take a while..."
@@ -69,13 +87,13 @@ colemak () {
     echo "This utility will install colemak mod-dh keyboard layout"
     if user_ack ; then
         echo "Installing colemak."
-        pushd ~/src/
+        pushd ~/src/ || exit 1
         git clone https://github.com/ColemakMods/mod-dh.git
-        popd
+        popd || exit 1
 
-        pushd ~/src/mod-dh/macOS
+        pushd ~/src/mod-dh/macOS || exit 1
         sudo cp -r Colemak\ DH.bundle /Library/Keyboard\ Layouts/Colemak\ DH.bundle
-        popd
+        popd || exit 1
 
         echo "Please logout and login, if needed go to SysPref > Keyboard > Input Sources and enable the keyboard"
         
@@ -88,7 +106,7 @@ all () {
     install_zprezto
     setup_file_system
     link
-    vim_theme
+    editor_themes
     install_tools
     colemak
 }
@@ -98,7 +116,7 @@ menu () {
     $BBlue 1) $Reset Install zprezto
     $BBlue 2) $Reset Setup file system
     $BBlue 3) $Reset Symlink dotfiles
-    $BBlue 4) $Reset Install vim theme
+    $BBlue 4) $Reset Install editor themes
     $BBlue 5) $Reset Install brew packages
     $BBlue 6) $Reset Install Colemak Mod-dh
     $BGreen 7) $Reset All
@@ -108,7 +126,7 @@ menu () {
         1) install_zprezto ; menu ;;
         2) setup_file_system ; menu ;;
         3) link ; menu ;;
-        4) vim_theme ; menu ;;
+        4) editor_themes ; menu ;;
         5) install_tools ; menu ;;
         6) colemak ; menu ;;
         7) all ; menu ;;
@@ -118,4 +136,3 @@ menu () {
 }
 
 menu
-# TODO: Install apps too
