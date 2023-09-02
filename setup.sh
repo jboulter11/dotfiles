@@ -24,7 +24,12 @@ link () {
 			ln -sv "$BASE_DIR/symlinked_to_home/$file" "$HOME"
 		done
 
-		echo "Symlinking complete"
+                mkdir -p "$BASE_DIR/.config"
+                for file in $( ls -A symlinked_to_config/ ) ; do
+                        ln -sv "$BASE_DIR/symlinked_to_config/$file" "$HOME/.config"
+                done
+
+                echo "Symlinking complete"
 	else
 		echo "Symlinking cancelled by user"
 		return 1
