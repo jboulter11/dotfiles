@@ -204,6 +204,7 @@ require("lazy").setup({
     },
     opts = {
       -- configurations go here
+      theme = "monokai-pro",
     },
   },
 
@@ -284,6 +285,12 @@ vim.o.completeopt = "menuone,noselect"
 -- NOTE: You should make sure your terminal supports this
 vim.o.termguicolors = true
 
+-- Indentation
+vim.o.tabstop = 4
+vim.o.shiftwidth = 4
+vim.o.expandtab = true
+vim.o.smartindent = true
+
 -- [[ Basic Keymaps ]]
 
 -- Keymaps for better default experience
@@ -352,11 +359,12 @@ vim.keymap.set("n", "<leader>s<C-d>", "<Cmd>SessionDelete<CR>", { desc = "[S]ess
 -- See `:help nvim-treesitter`
 require("nvim-treesitter.configs").setup {
   -- Add languages to be installed here that you want installed for treesitter
-  ensure_installed = { "c", "cpp", "go", "lua", "python", "rust", "vimdoc", "vim", "swift", "objc" },
+  ensure_installed = { "c", "cpp", "go", "lua", "python", "rust", "vimdoc", "vim", "swift", "objc", "ruby" },
 
   -- Autoinstall languages that are not installed. Defaults to false (but you can change for yourself!)
   auto_install = true,
 
+  compilers = { "clang", "gcc" },
   highlight = { enable = true },
   indent = { enable = true },
   incremental_selection = {
@@ -413,6 +421,21 @@ require("nvim-treesitter.configs").setup {
     },
   },
 }
+
+vim.api.nvim_exec([[
+  augroup custom_filetypes
+    autocmd!
+    au BufNewFile,BufRead Appfile set ft=ruby
+    au BufNewFile,BufRead Deliverfile set ft=ruby
+    au BufNewFile,BufRead Fastfile set ft=ruby
+    au BufNewFile,BufRead Gymfile set ft=ruby
+    au BufNewFile,BufRead Matchfile set ft=ruby
+    au BufNewFile,BufRead Snapfile set ft=ruby
+    au BufNewFile,BufRead Scanfile set ft=ruby
+  augroup END
+]], false)
+
+vim.api.nvim_set_hl(0, "WinSeparator", { fg="#D4406A" })
 
 -- Diagnostic keymaps
 -- vim.keymap.set("n", "[d", vim.diagnostic.goto_prev, { desc = "Go to previous diagnostic message" })
@@ -579,7 +602,6 @@ cmp.setup {
 
 vim.keymap.set("n", "<leader>tf", "<Cmd>Neotree<CR>", { desc = "Neo[T]ree [F]ilesystem" })
 vim.keymap.set("n", "<leader>tg", "<Cmd>Neotree<CR>", { desc = "Neo[T]ree [G]it Status" })
-
 
 -- The line beneath this is called `modeline`. See `:help modeline`
 -- vim: ts=2 sts=2 sw=2 et

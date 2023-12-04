@@ -2,8 +2,8 @@ if [[ -s "${ZDOTDIR:-$HOME}/.zprezto/init.zsh" ]]; then
   source "${ZDOTDIR:-$HOME}/.zprezto/init.zsh"
 fi
 
-export EDITOR=/usr/bin/vim
-export VISUAL=/usr/bin/vim
+export EDITOR=nvim
+export VISUAL=nvim
 
 autoload -Uz promptinit
 promptinit
@@ -147,6 +147,27 @@ function buckproj() {
     open $file
 }
 
+function replace() {
+  local pattern="$1"
+  local replacement="$2"
+  local escaped_pattern
+  local escaped_replacement
+  escaped_pattern=$(escape_for_sed "$pattern")
+  escaped_replacement=$(escape_for_sed "$replacement")
+
+  if [[ "$3" == "-s" ]]; then
+    rg "$escaped_pattern" --files-with-matches | xargs sed -i "" "s/$escaped_pattern/$escaped_replacement/g"
+  else
+    rg "$escaped_pattern" --files-with-matches | xargs sed -i "" "s/$escaped_pattern/$escaped_replacement/g" | tee /dev/tty
+  fi
+
+  find . -type f -name "*.bak" -delete
+}
+
+function escape_for_sed() {
+  echo "$1" | sed 's/[\^\/]/\\&/g'
+}
+
 [ -f ~/.fzf.zsh ] && source ~/.fzf.zsh
 
 # From repo_setup:
@@ -170,10 +191,11 @@ export PATH="/opt/homebrew/opt/php@7.4/sbin:$PATH"
 eval "$(/opt/homebrew/bin/brew shellenv)"
 # From repo_setup:
 export JAVA_HOME="/Users/jboulter/.dbx_jdk/zulu17.42.19-ca-jdk17.0.7-macosx_aarch64"
-# From repo_setup:
-export PATH="$HOME/.pyenv/shims:$PATH"
 alias td="./td"
 # load tooldir completions
 fpath+=(~/.zsh/completion)
 autoload -U compinit
 compinit
+eval "$(pyenv init -)"
+# From repo_setup:
+export PATH="$HOME/.pyenv/shims:$PATH"
