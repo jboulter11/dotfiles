@@ -54,6 +54,8 @@ brew install neovim
 brew install --cask readdle-spark
 brew install --cask fertigt-slate
 brew install --cask obsidian
+brew install devutils
+brew install --cask copilot-for-xcode
 
 # xcode commandline tools
 sudo xcode-select --install
