@@ -141,9 +141,11 @@ require("lazy").setup({
     "lukas-reineke/indent-blankline.nvim",
     -- Enable `lukas-reineke/indent-blankline.nvim`
     -- See `:help indent_blankline.txt`
+    main = "ibl",
     opts = {
-      -- char = "┊",
-      show_trailing_blankline_indent = false,
+      indent = {
+        char = {"│"},
+      },
     },
   },
 
@@ -603,5 +605,29 @@ cmp.setup {
 vim.keymap.set("n", "<leader>tf", "<Cmd>Neotree<CR>", { desc = "Neo[T]ree [F]ilesystem" })
 vim.keymap.set("n", "<leader>tg", "<Cmd>Neotree<CR>", { desc = "Neo[T]ree [G]it Status" })
 
+-- [[ Configure indent blankline ]]
+-- highlights for indent blank line
+local highlight = {
+    "RainbowRed",
+    "RainbowYellow",
+    "RainbowBlue",
+    "RainbowOrange",
+    "RainbowGreen",
+    "RainbowViolet",
+}
+
+local hooks = require("ibl.hooks")
+-- create the highlight groups in the highlight setup hook, so they are reset
+-- every time the colorscheme changes
+hooks.register(hooks.type.HIGHLIGHT_SETUP, function()
+    vim.api.nvim_set_hl(0, "RainbowRed", { fg = "#ff6188" })
+    vim.api.nvim_set_hl(0, "RainbowOrange", { fg = "#fc9867" })
+    vim.api.nvim_set_hl(0, "RainbowYellow", { fg = "#ffd866" })
+    vim.api.nvim_set_hl(0, "RainbowGreen", { fg = "#a9dc76" })
+    vim.api.nvim_set_hl(0, "RainbowBlue", { fg = "#78dce8" })
+    vim.api.nvim_set_hl(0, "RainbowViolet", { fg = "#ab9df2" })
+end)
+
+require("ibl").update { indent = { highlight = highlight } }
 -- The line beneath this is called `modeline`. See `:help modeline`
 -- vim: ts=2 sts=2 sw=2 et

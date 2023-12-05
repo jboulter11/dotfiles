@@ -56,6 +56,7 @@ brew install --cask fertigt-slate
 brew install --cask obsidian
 brew install devutils
 brew install --cask copilot-for-xcode
+brew install gh
 
 # xcode commandline tools
 sudo xcode-select --install
