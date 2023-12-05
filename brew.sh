@@ -50,6 +50,8 @@ brew install --cask bettertouchtool
 brew install --cask meetingbar
 brew install --cask db-browser-for-sqlite
 brew install --cask karabiner-elements
+brew install --cask xcodes
+brew install neovim
 
 # xcode commandline tools
 sudo xcode-select --install
