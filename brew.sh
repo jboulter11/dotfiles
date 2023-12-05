@@ -27,7 +27,6 @@ brew install fzf
 brew install swift-sh
 brew install ripgrep
 brew install pyenv
-brew install robotsandpencils/made/xcodes
 brew install --cask alfred
 brew install fd
 brew install sourcery
@@ -52,6 +51,9 @@ brew install --cask db-browser-for-sqlite
 brew install --cask karabiner-elements
 brew install --cask xcodes
 brew install neovim
+brew install --cask readdle-spark
+brew install --cask fertigt-slate
+brew install --cask obsidian
 
 # xcode commandline tools
 sudo xcode-select --install
