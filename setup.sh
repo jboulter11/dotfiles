@@ -7,33 +7,34 @@ source "$BASE_DIR/utilities.sh"
 
 # Setup FS
 setup_file_system () {
-	pushd ~ || exit 1
+    pushd ~ || exit 1
     # Create code directory
-	mkdir ~/src
-    # clone notes repository to create notes directory
-	git clone https://github.com/jboulter11/notes
-	popd || exit 1
+    mkdir ~/src
+
+    mkdir ~/screenshots
+    defaults write com.apple.screencapture location ~/screenshots
+    popd || exit 1
 }
 
 # TODO : Delete symlinks to deleted files
 # TODO - add support for -f and --force
 link () {
-	echo "This utility will symlink the files in this repo to the home directory"
-	if user_ack ; then
-		for file in $( ls -A symlinked_to_home/ ) ; do
-			ln -sv "$BASE_DIR/symlinked_to_home/$file" "$HOME"
-		done
+    echo "This utility will symlink the files in this repo to the home directory"
+    if user_ack ; then
+        for file in $( ls -A symlinked_to_home/ ) ; do
+            ln -sv "$BASE_DIR/symlinked_to_home/$file" "$HOME"
+        done
 
-                mkdir -p "$BASE_DIR/.config"
-                for file in $( ls -A symlinked_to_config/ ) ; do
-                        ln -sv "$BASE_DIR/symlinked_to_config/$file" "$HOME/.config"
-                done
+            mkdir -p "$BASE_DIR/.config"
+            for file in $( ls -A symlinked_to_config/ ) ; do
+                    ln -sv "$BASE_DIR/symlinked_to_config/$file" "$HOME/.config"
+            done
 
-                echo "Symlinking complete"
-	else
-		echo "Symlinking cancelled by user"
-		return 1
-	fi
+            echo "Symlinking complete"
+    else
+        echo "Symlinking cancelled by user"
+        return 1
+    fi
 }
 
 editor_themes() {
@@ -62,17 +63,17 @@ editor_themes() {
 }
 
 install_tools () {
-	if [ "$( echo "$OSTYPE" | grep 'darwin' )" ] ; then
-		echo "This utility will install useful utilities using Homebrew"
-		if user_ack ; then
-			echo "Installing useful stuff using brew. This may take a while..."
-			sh brew.sh
-		else
-			echo "Brew installation cancelled by user"
-		fi
-	else
-		echo "Skipping installations using Homebrew because MacOS was not detected..."
-	fi
+    if [ "$( echo "$OSTYPE" | grep 'darwin' )" ] ; then
+        echo "This utility will install useful utilities using Homebrew"
+        if user_ack ; then
+            echo "Installing useful stuff using brew. This may take a while..."
+            sh brew.sh
+        else
+            echo "Brew installation cancelled by user"
+        fi
+    else
+        echo "Skipping installations using Homebrew because MacOS was not detected..."
+    fi
 }
 
 install_zprezto () {

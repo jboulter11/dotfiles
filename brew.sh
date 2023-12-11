@@ -58,6 +58,7 @@ brew install devutils
 brew install --cask copilot-for-xcode
 brew install gh
 brew install --cask keyboard-maestro
+brew install --cask arc
 
 # xcode commandline tools
 sudo xcode-select --install
