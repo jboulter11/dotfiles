@@ -1,3 +1,5 @@
+#!/bin/bash
+
 alias db='cd ~/src/xplat/'
 alias db2='cd ~/src/xplat2/'
 alias dbmake='./submodule_update.sh && make project_dbapp && open buck-out/gen/dbapp-ios/Dropbox/Dropbox.xcodeproj'
@@ -33,3 +35,97 @@ PATH=$PATH:~/src/xplat/tools/buck/bin/
 PATH=$PATH:~/src/GitChildBranchHelpers/bin/
 
 ssh-add --apple-use-keychain ~/.ssh/id_ed25519_dbx_github > /dev/null 2>&1 
+
+alias gbc="git_branch_cleanup"
+function git_branch_cleanup() {
+    RED='\033[0;31m'
+    NC='\033[0m' # No Color
+
+    git checkout main
+
+    for branch in $(git for-each-ref --format='%(refname:short)' refs/heads/ | egrep -v "(main|jboulter)")
+    do
+        if git diff main $branch --exit-code --quiet
+        then
+            echo -e "${RED}DELETING $branch${NC}"
+            git branch -D $branch
+        fi
+    done
+}
+
+alias gpm="git_pull_main"
+function git_pull_main() {
+    if ! { git diff --cached --exit-code --quiet && git diff --exit-code --quiet; }
+    then
+        echo "Checkout is dirty!"
+        return 1
+    fi
+
+    stop_tooling
+
+    git checkout main
+    git prune
+    git fetch --prune
+    git pull --rebase --autostash
+    ./td setup --task python3-packages
+    ./td sub
+}
+
+alias grs="git_rebase_stacks"
+function git_rebase_stacks() {
+    GREEN='\033[0;32m'
+    NC='\033[0m' # No Color
+
+    if ! { git diff --cached --exit-code --quiet && git diff --exit-code --quiet; }
+    then
+        echo "Checkout is dirty!"
+        return 1
+    fi
+
+    set -e
+
+    git checkout main
+
+    # Nasty, but the intent here is to loop the branches in "tree order" - I want to rebase branches further up the tree first
+    # so that any stacked branches will rebase their upstream branches at the same time
+    BRANCHES=$(git log --pretty="format:%D" --graph --branches -10000 | perl -ne 'for (split /[\s,]+/) { print $_ . "\n" if /^[a-z0-9\_]+$/ && !/main/}')
+
+    echo $BRANCHES
+    #for branch in $(git for-each-ref --format='%(refname:short)'  --sort='-committerdate' refs/heads/ | egrep -v '^(main|jboulter)')
+
+    for branch in $BRANCHES
+    do
+        echo -e "${GREEN}*** ${branch}${NC}"
+        git co $branch
+        /opt/homebrew/bin/git rebase main --update-refs # -X theirs
+    done
+
+    git checkout main
+}
+
+function stop_tooling() {
+    echo "Killing watchman"
+    killall watchman || true
+
+    if [ -f ".buckconfig" ]
+    then
+        echo "Killing buck"
+        buck kill
+    fi
+
+    rm -rf .buckconfig.d/.watchman-cookie-*
+
+    if pgrep -qf MacOS/Xcode
+    then
+        echo "Killing xcode"
+        killall -9 Xcode || true
+        sleep 2
+    fi
+
+    if pgrep -qf MacOS/Xcode
+    then
+        echo "Killing xcode"
+        killall -9 Xcode || true
+        sleep 2
+    fi
+}

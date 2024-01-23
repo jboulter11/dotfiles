@@ -15,8 +15,6 @@ fi
 
 git -C $(brew --repo homebrew/core) checkout master
 
-pushd /Applications && curl http://www.ninjamonkeysoftware.com/slate/versions/slate-latest.tar.gz | tar -xz ; popd || exit
-
 # Make sure we’re using the latest Homebrew
 brew update
 
@@ -59,6 +57,7 @@ brew install --cask copilot-for-xcode
 brew install gh
 brew install --cask keyboard-maestro
 brew install --cask arc
+brew install --cask charles
 
 # xcode commandline tools
 sudo xcode-select --install
@@ -66,3 +65,5 @@ sudo xcode-select --install
 # install fzf completions
 "$(brew --prefix)"/opt/fzf/install
 
+# Xcodes Themes
+cp xcode_themes/*.xccolortheme ~/Library/Developer/Xcode/UserData/FontAndColorThemes/ 

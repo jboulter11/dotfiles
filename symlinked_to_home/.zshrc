@@ -21,11 +21,12 @@ alias gb='git branch'
 alias gac='git add .; git commit -m'
 alias gd='git diff'
 alias pi='pod install'
-alias gfm='git fetch origin master:master'
-alias gfmr='gfm && git rebase master'
+alias gfm='git fetch origin main:main'
+alias gfmr='gfm && git rebase main'
 alias grc='git rebase --continue'
 alias ga.='git add .'
 alias garc='git add .; git rebase --continue'
+alias gco='git checkout'
 
 alias rmdd='rm -rf $HOME/Library/Developer/Xcode/DerivedData'
 
@@ -38,86 +39,6 @@ function cd {
 
 function simVideo() {
   xcrun simctl io booted recordVideo "$@"
-}
-
-function gco() {
-  if [[ $1 =~ ^- ]]; then
-    checkoutWithOptions $@
-  else
-    checkoutWithOptions "" $@
-  fi
-}
-
-function checkoutWithOptions() {
-  if [[ "$2" == "master" ]]; then
-    git checkout $@
-  else
-    git checkout $1 "dbapp-ios/jboulter/$2"
-  fi
-}
-
-function gp() {
-  plannerRegex=".*Planner-iOS$";
-  if [[ ! "$PWD" =~ $plannerRegex ]] || (echo "Running tests before pushing" && rpt); then
-    echo "Pushing";
-    git push "$@";
-  else
-    tput setaf 1;
-    echo "Did not push changes due to failed tests";
-    tput sgr0;
-  fi
-
-}
-
-function rpt() {
-  set -o pipefail && xcodebuild \
-    -parallelizeTargets \
-    -UseNewBuildSystem=YES \
-    -workspace Planner.xcworkspace \
-    -scheme Planner-Test \
-    -configuration Test \
-    -sdk iphonesimulator \
-    -destination 'platform=iOS Simulator,name=iPhone Xʀ,OS=latest' \
-    test | xcpretty --color
-}
-
-function packageArchive() {
-  set -x
-  incrementBuildNumbers $1
-
-  xcodebuild \
-  -parallelizeTargets \
-  -UseNewBuildSystem=YES \
-  -workspace Planner.xcworkspace \
-  -scheme Planner-Release \
-  -configuration Release \
-  -sdk iphoneos \
-  archive \
-  -archivePath ~/code/PlannerReleases/$1/Planner.xcarchive \
-  | xcpretty --color
-
-  copyDistributionStuff $1
-  zipArchive $1
-  set +x
-}
-
-function incrementBuildNumbers() {
-  #pushd ~/code/Planner-iOS
-  currentTime=`date +'%y%m%d%H'`
-  agvtool new-marketing-version $1
-  agvtool new-version -all 1.1.$currentTime
-  #popd
-}
-
-function copyDistributionStuff() {
-  cp ~/code/Planner-iOS/Signing/Microsoft_Planner_Distribution.mobileprovision ~/code/PlannerReleases/$1/Microsoft_Planner_Distribution.mobileprovision
-  cp ~/code/Planner-iOS/Signing/exportOptions.plist ~/code/PlannerReleases/$1/exportOptions.plist
-}
-
-function zipArchive() {
-  pushd ~/code/PlannerReleases/$1/
-  zip -r Planner_$1.zip * -x "*.DS_Store"
-  popd
 }
 
 # altool
