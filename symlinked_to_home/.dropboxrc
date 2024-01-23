@@ -23,35 +23,22 @@ function b() {
     TARGET_PATH="/${MY_PATH#$BUCK_PATH}"
     BUILD_PATH=$TARGET_PATH$1
     echo "$BUILD_PATH"
-    buck build "$BUILD_PATH"
+    buckw build "$BUILD_PATH"
 }
 
 function vv() {
-    buck query "attrfilter('module_name', '$1', '//...')" | tail -1
+    buckw query "attrfilter('module_name', '$1', '//...')" | tail -1
 }
 
-alias buck='tools/buck/bin/buck'
 PATH=$PATH:~/src/xplat/tools/buck/bin/
 PATH=$PATH:~/src/GitChildBranchHelpers/bin/
 
-ssh-add --apple-use-keychain ~/.ssh/id_ed25519_dbx_github > /dev/null 2>&1 
+ssh-add --apple-use-keychain ~/.ssh/id_ed25519_dbx_github > /dev/null 2>&1
 
-alias gbc="git_branch_cleanup"
-function git_branch_cleanup() {
-    RED='\033[0;31m'
-    NC='\033[0m' # No Color
-
-    git checkout main
-
-    for branch in $(git for-each-ref --format='%(refname:short)' refs/heads/ | egrep -v "(main|jboulter)")
-    do
-        if git diff main $branch --exit-code --quiet
-        then
-            echo -e "${RED}DELETING $branch${NC}"
-            git branch -D $branch
-        fi
-    done
-}
+# Stacked diffs flow
+# run git pull main
+# run branch cleanup
+# run rebase stacks
 
 alias gpm="git_pull_main"
 function git_pull_main() {
@@ -69,10 +56,34 @@ function git_pull_main() {
     git pull --rebase --autostash
     ./td setup --task python3-packages
     ./td sub
+    git status
+}
+
+alias gbc="git_branch_cleanup"
+function git_branch_cleanup() {
+    RED='\033[0;31m'
+    GREEN='\033[0;32m'
+    NC='\033[0m' # No Color
+
+    git checkout main
+
+    for branch in $(git for-each-ref --format='%(refname:short)' refs/heads/ | egrep -v "(main|jboulter)")
+    do
+        git diff main $branch --exit-code --quiet
+        if [ $? -eq 0 ]
+        then
+            echo -e "${RED}DELETING $branch${NC}"
+            git branch -D $branch
+        else
+            echo -e "${GREEN}Keeping $branch${NC}"
+        fi
+    done
+    echo "Finished cleaning"
 }
 
 alias grs="git_rebase_stacks"
 function git_rebase_stacks() {
+    RED='\033[0;31m'
     GREEN='\033[0;32m'
     NC='\033[0m' # No Color
 
@@ -82,22 +93,33 @@ function git_rebase_stacks() {
         return 1
     fi
 
-    set -e
-
     git checkout main
 
     # Nasty, but the intent here is to loop the branches in "tree order" - I want to rebase branches further up the tree first
     # so that any stacked branches will rebase their upstream branches at the same time
-    BRANCHES=$(git log --pretty="format:%D" --graph --branches -10000 | perl -ne 'for (split /[\s,]+/) { print $_ . "\n" if /^[a-z0-9\_]+$/ && !/main/}')
+    BRANCHES_STRING=$(git log --pretty="format:%D" --graph --branches -10000 | perl -ne 'for (split /[\s,]+/) { print $_ . "\n" if /^[a-z0-9\_]+$/ && !/main/}')
+
+    read -d '' -A BRANCHES <<< "$BRANCHES_STRING"
 
     echo $BRANCHES
+    
     #for branch in $(git for-each-ref --format='%(refname:short)'  --sort='-committerdate' refs/heads/ | egrep -v '^(main|jboulter)')
 
     for branch in $BRANCHES
     do
         echo -e "${GREEN}*** ${branch}${NC}"
-        git co $branch
-        /opt/homebrew/bin/git rebase main --update-refs # -X theirs
+        git checkout $branch
+        if [ $? -ne 0 ]
+        then
+            echo -e "${RED}Skipping ${branch}, cannot checkout${NC}"
+        else
+            /opt/homebrew/bin/git rebase main --update-refs # -X theirs
+            if [ $? -ne 0 ]
+            then
+                echo -e "${RED}Could not rebase ${branch}, please fix and finish rebase, then re-run.${NC}"
+                break
+            fi
+        fi
     done
 
     git checkout main
