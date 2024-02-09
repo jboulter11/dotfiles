@@ -8,8 +8,8 @@ alias dbtags='git for-each-ref --shell --sort=creatordate --format="%(refname:sh
 alias ghd='gh dbx'
 alias gpr='gh dbx pr'
 alias gprf='gh dbx pr --force-push'
-alias ghdm='gh dbx merge --keep-branch --slack-notify'
-alias land='gh dbx land --keep-branch --slack-notify'
+alias ghdm='gh dbx merge --keep-branch'
+alias land='gh dbx land --keep-branch'
 
 alias arcpaste='git diff master | arc paste --'
 alias mkbuild='arc test xplat_dbapp_ios_and_upload_vm'
@@ -30,8 +30,8 @@ function vv() {
     buckw query "attrfilter('module_name', '$1', '//...')" | tail -1
 }
 
-PATH=$PATH:~/src/xplat/tools/buck/bin/
 PATH=$PATH:~/src/GitChildBranchHelpers/bin/
+eval "$(direnv hook zsh)"
 
 ssh-add --apple-use-keychain ~/.ssh/id_ed25519_dbx_github > /dev/null 2>&1
 
@@ -150,4 +150,43 @@ function stop_tooling() {
         killall -9 Xcode || true
         sleep 2
     fi
+}
+
+alias gcsm="git_cleanup_squash_merged"
+function git_cleanup_squash_merged() {
+    if ! { git diff --cached --exit-code --quiet && git diff --exit-code --quiet; }
+    then
+        echo "Checkout is dirty!"
+        return 1
+    fi
+    BRANCH=$1
+    if [[ -z "$BRANCH" ]]
+    then
+        echo "No branch specified"
+        return 1
+    fi
+
+    echo "Searching for squashed commit..."
+    SQUASHED_COMMIT="$(find_matching_squashed_commit "$BRANCH")"
+    echo "Found squashed commit: $SQUASHED_COMMIT"
+    git rebase --onto $SQUASHED_COMMIT $BRANCH
+}
+
+function find_matching_squashed_commit() {
+    BRANCH=$1
+    git checkout $BRANCH
+    for commit in $(git rev-list main); do
+        AUTHOR=$(git log --format='%ae' -n 1 $commit)
+        if [[ "$AUTHOR" == *"jboulter"* ]]; then
+            echo "Checking $commit..." >&2
+            git cherry-pick --no-commit $commit $BRANCH &> /dev/null
+            if [ -z "$(git status --porcelain)" ]; then
+                echo "Found matching commit on main: $commit" >&2
+                echo "$commit"
+                break
+            fi
+            git cherry-pick --abort &> /dev/null
+            git reset --hard --quiet
+        fi
+    done
 }
