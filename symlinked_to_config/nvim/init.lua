@@ -244,6 +244,18 @@ require("lazy").setup({
       },
     },
   },
+  {
+    -- DiffView to show diff or resolve conflicts in nvim
+    "sindrets/diffview.nvim",
+  },
+  {
+    -- ToggleTerm - Toggle-able terminal view within nvim
+    'akinsho/toggleterm.nvim',
+    version = "*",
+    opts = {
+
+    },
+  },
 }, {})
 
 -- [[ Setting options ]]
@@ -292,6 +304,9 @@ vim.o.tabstop = 4
 vim.o.shiftwidth = 4
 vim.o.expandtab = true
 vim.o.smartindent = true
+
+-- Fill pattern
+vim.opt.fillchars:append { diff = "╱" }
 
 -- [[ Basic Keymaps ]]
 
@@ -356,6 +371,20 @@ vim.keymap.set("n", "<leader>ss", "<Cmd>SessionStop<CR>", { desc = "[S]ession [S
 vim.keymap.set("n", "<leader>sl", "<Cmd>SessionLoad<CR>", { desc = "[S]ession [L]oad" })
 vim.keymap.set("n", "<leader>s<C-d>", "<Cmd>SessionDelete<CR>", { desc = "[S]ession [D]elete" })
 
+-- Diffview keymaps
+vim.keymap.set("n", "<leader>do", "<Cmd>DiffviewOpen<CR>", { desc = "[D]iffview [O]pen" })
+vim.keymap.set("n", "<leader>dc", "<Cmd>DiffviewClose<CR>", { desc = "[D]iffview [C]lose" })
+
+-- ToggleTerm keymaps
+vim.keymap.set("n", "<leader>te", "<Cmd>ToggleTerm size=100 direction=vertical name=toggleterm<CR>", { desc = "Toggle [T][E]rminal" })
+function _G.set_terminal_keymaps()
+  local opts = {buffer = 0}
+  vim.keymap.set('t', '<esc>', [[<C-\><C-n>]], opts)
+  vim.keymap.set('t', '<C-w>', [[<C-\><C-n><C-w>]], opts)
+end
+
+-- if you only want these mappings for toggle term use term://*toggleterm#* instead
+vim.cmd('autocmd! TermOpen term://* lua set_terminal_keymaps()')
 
 -- [[ Configure Treesitter ]]
 -- See `:help nvim-treesitter`
