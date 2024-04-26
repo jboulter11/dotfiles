@@ -463,6 +463,7 @@ vim.api.nvim_exec([[
     au BufNewFile,BufRead Matchfile set ft=ruby
     au BufNewFile,BufRead Snapfile set ft=ruby
     au BufNewFile,BufRead Scanfile set ft=ruby
+    au BufNewFile,BufRead BUCK set ft=bzl
   augroup END
 ]], false)
 
@@ -578,6 +579,10 @@ sourcekit_cmd = sourcekit_cmd:gsub("\n", "")
 
 require("lspconfig").sourcekit.setup {
   cmd = { sourcekit_cmd }
+}
+
+require("lspconfig").starpls.setup {
+  filetypes = { "bzl", "bazel", "buck" }
 }
 
 -- [[ Configure nvim-cmp ]]
