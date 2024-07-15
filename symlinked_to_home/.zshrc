@@ -122,7 +122,5 @@ export PATH="/Users/jboulter/.local/share/sentry-devenv/bin:$PATH"
 
 
 eval "$(direnv hook zsh)"
-
-
 # From repo_setup:
 export PATH="$HOME/.pyenv/shims:$PATH"
