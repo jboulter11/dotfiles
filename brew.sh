@@ -31,7 +31,6 @@ brew install sourcery
 brew install rbenv
 brew install shellcheck
 brew install socat
-brew install --cask setapp
 brew install --cask sim-genie
 brew install --cask 1password
 brew install --cask 1password/tap/1password-cli
@@ -45,7 +44,6 @@ brew install --cask nslogger
 brew install --cask paw
 brew install --cask bettertouchtool
 brew install --cask meetingbar
-brew install --cask db-browser-for-sqlite
 brew install --cask karabiner-elements
 brew install --cask xcodes
 brew install neovim
@@ -57,7 +55,10 @@ brew install --cask copilot-for-xcode
 brew install gh
 brew install --cask keyboard-maestro
 brew install --cask arc
-brew install --cask charles
+brew install --cask proxyman
+brew install --cask hiddenbar
+brew install --cask beekeeper-studio
+brew install --cask ghostty
 
 # xcode commandline tools
 sudo xcode-select --install

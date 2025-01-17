@@ -25,12 +25,17 @@ link () {
             ln -sv "$BASE_DIR/symlinked_to_home/$file" "$HOME"
         done
 
-            mkdir -p "$BASE_DIR/.config"
-            for file in $( ls -A symlinked_to_config/ ) ; do
-                    ln -sv "$BASE_DIR/symlinked_to_config/$file" "$HOME/.config"
-            done
+        mkdir -p "$HOME/.config"
+        for file in $( ls -A symlinked_to_config/ ) ; do
+                ln -sv "$BASE_DIR/symlinked_to_config/$file" "$HOME/.config"
+        done
 
-            echo "Symlinking complete"
+        mkdir -p "$HOME/Library/Application Support/espanso/match/"
+        for file in $( ls -A symlinked_to_espanso/ ) ; do
+            ln -sv "$BASE_DIR/symlinked_to_espanso/$file" "$HOME/Library/Application Support/espanso/match"
+        done
+
+        echo "Symlinking complete"
     else
         echo "Symlinking cancelled by user"
         return 1

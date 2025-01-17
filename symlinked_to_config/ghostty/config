@@ -1,0 +1,10 @@
+keybind = global:option+space=toggle_quick_terminal
+
+font-family = "BerkeleyMono Nerd Font Mono"
+font-size = 14
+background-opacity = 0.9
+background-blur-radius = 20
+quick-terminal-screen = macos-menu-bar
+quick-terminal-animation-duration = 0
+initial-window = false
+theme = "Monokai Remastered"

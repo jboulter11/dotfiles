@@ -34,27 +34,27 @@ source ~/.dropboxrc
 
 #Functions
 function cd {
-  builtin cd "$@" && ls -F
+    builtin cd "$@" && ls -F
 }
 
 function simVideo() {
-  xcrun simctl io booted recordVideo "$@"
+    xcrun simctl io booted recordVideo "$@"
 }
 
 # altool
 PATH=$PATH:/Applications/Xcode.app/Contents/Applications/Application\ Loader.app/Contents/Frameworks/ITunesSoftwareService.framework/Support/
 
 function killCoreAudio() {
-    sudo launchctl stop com.apple.audio.coreaudiod && sudo launchctl start com.apple.audio.coreaudiod
+    sudo pkill -9 coreaudiod
 }
 
 # Chrome
 function chrome() {
-  open -na "Google Chrome" --args $@
+    open -na "Google Chrome" --args $@
 }
 
 function incognito() {
-  open -na "Google Chrome" --args --incognito $@
+    open -na "Google Chrome" --args --incognito $@
 }
 
 function mkBuck() {
@@ -124,3 +124,5 @@ export PATH="/Users/jboulter/.local/share/sentry-devenv/bin:$PATH"
 eval "$(direnv hook zsh)"
 # From repo_setup:
 export PATH="$HOME/.pyenv/shims:$PATH"
+
+export BAZEL=1

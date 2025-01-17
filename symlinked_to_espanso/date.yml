@@ -1,0 +1,72 @@
+# date time format options:
+# https://docs.rs/chrono/latest/chrono/format/strftime/index.html
+
+matches:  
+  - label: "Interview timestamp"
+    trigger: "int;"
+    replace: "=={{time}} "
+    vars:
+      - name: time
+        type: match
+        params:
+          trigger: time;
+  
+  - label: "Insert current date (short)"
+    trigger: "date;"
+    replace: "{{date}}"
+    vars:
+      - name: date
+        type: date
+        params:
+          format: "%F"
+  
+  - label: "Insert current time (short)"
+    trigger: "time;"
+    replace: "{{date}}"
+    vars:
+      - name: date
+        type: date
+        params:
+          format: "%T"
+          
+  - label: "Insert current date and time (short)"
+    trigger: "datetime;"
+    replace: "{{date}} {{time}}"
+    vars:
+      - name: date
+        type: match
+        params:
+          trigger: date;
+      - name: time
+        type: match
+        params:
+          trigger: time;
+          
+  - label: "Insert current date and time (filename)"
+    trigger: "datetimefile;"
+    replace: "{{date}}"
+    vars:
+      - name: date
+        type: date
+        params:
+          format: "%Y-%m-%d_%H.%M.%S"
+  
+  - label: "Insert ISO8601 date time stamp"
+    trigger: "iso;"
+    replace: "{{date}}"
+    vars:
+      - name: date
+        type: date
+        params:
+          format: "%FT%T%:z"
+  
+  - label: "Insert unix timestamp"
+    trigger: "unix;"
+    replace: "{{date}}"
+    vars:
+      - name: date
+        type: date
+        params:
+          format: "%s"
+  
+
