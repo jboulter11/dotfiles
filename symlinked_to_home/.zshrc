@@ -110,8 +110,6 @@ export PATH="/opt/homebrew/opt/php@7.4/bin:$PATH"
 export PATH="/opt/homebrew/opt/php@7.4/sbin:$PATH"
 
 eval "$(/opt/homebrew/bin/brew shellenv)"
-# From repo_setup:
-export JAVA_HOME="/Users/jboulter/.dbx_jdk/zulu17.42.19-ca-jdk17.0.7-macosx_aarch64"
 alias td="./td"
 # load tooldir completions
 fpath+=(~/.zsh/completion)
@@ -122,7 +120,10 @@ export PATH="/Users/jboulter/.local/share/sentry-devenv/bin:$PATH"
 
 
 eval "$(direnv hook zsh)"
-# From repo_setup:
-export PATH="$HOME/.pyenv/shims:$PATH"
 
 export BAZEL=1
+
+# From repo_setup:
+export PATH="$HOME/.pyenv/shims:$PATH"
+# From repo_setup:
+export JAVA_HOME="/Users/jboulter/.dbx_jdk/zulu21.32.17-ca-fx-jdk21.0.2-macosx_aarch64"

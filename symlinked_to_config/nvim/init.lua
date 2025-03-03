@@ -73,6 +73,11 @@ require("lazy").setup({
       -- Adds a number of user-friendly snippets
       "rafamadriz/friendly-snippets",
     },
+    opts = {
+      completion = {
+        autocomplete = false,
+      }
+    }
   },
 
   -- Useful plugin to show you pending keybinds.
@@ -230,6 +235,26 @@ require("lazy").setup({
       window = {
         ["t"] = nil,
       },
+      filesystem = {
+        filtered_items = {
+          hide_dotfiles = false,
+          hide_gitignored = false,
+          hide_by_name = {
+            "node_modules",
+            ".git",
+            ".DS_Store",
+            "bazel-out",
+          },
+        },
+        follow_current_file = {
+          enabled = true,
+        }
+      },
+      buffers = {
+        follow_current_file = {
+          enabled = true,
+        },
+      }
     },
   },
   {
@@ -252,6 +277,9 @@ require("lazy").setup({
 
     },
   },
+  {
+    "github/copilot.vim"
+  }
 }, {})
 
 -- [[ Setting options ]]
@@ -304,6 +332,8 @@ vim.o.smartindent = true
 -- Fill pattern
 vim.opt.fillchars:append { diff = "╱" }
 
+-- Autoread to pick up file changes on disk
+vim.opt.autoread = true
 
 -- [[ Highlight on yank ]]
 -- See `:help vim.highlight.on_yank()`
