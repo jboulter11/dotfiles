@@ -30,6 +30,8 @@ alias gco='git checkout'
 
 alias rmdd='rm -rf $HOME/Library/Developer/Xcode/DerivedData'
 
+alias lg='lazygit'
+
 source ~/.dropboxrc
 
 #Functions
@@ -122,8 +124,7 @@ export PATH="/Users/jboulter/.local/share/sentry-devenv/bin:$PATH"
 eval "$(direnv hook zsh)"
 
 export BAZEL=1
-
-# From repo_setup:
-export PATH="$HOME/.pyenv/shims:$PATH"
 # From repo_setup:
 export JAVA_HOME="/Users/jboulter/.dbx_jdk/zulu21.32.17-ca-fx-jdk21.0.2-macosx_aarch64"
+# From repo_setup:
+export PATH="$HOME/.pyenv/shims:$PATH"

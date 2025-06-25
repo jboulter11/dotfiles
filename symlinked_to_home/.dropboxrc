@@ -113,7 +113,7 @@ function git_rebase_stacks() {
         then
             echo -e "${RED}Skipping ${branch}, cannot checkout${NC}"
         else
-            /opt/homebrew/bin/git rebase main --update-refs # -X theirs
+            git rebase main --update-refs # -X theirs
             if [ $? -ne 0 ]
             then
                 echo -e "${RED}Could not rebase ${branch}, please fix and finish rebase, then re-run.${NC}"
@@ -167,26 +167,61 @@ function git_cleanup_squash_merged() {
     fi
 
     echo "Searching for squashed commit..."
-    SQUASHED_COMMIT="$(find_matching_squashed_commit "$BRANCH")"
+    SQUASHED_COMMIT="$(find_matching_squashed_commit "$BRANCH" 2>/dev/null | grep -Eo '^[0-9a-f]{40}$' | head -n1)"
+    if [[ -z "$SQUASHED_COMMIT" ]]; then
+        echo "Could not locate a matching squashed commit on main." >&2
+        return 1
+    fi
     echo "Found squashed commit: $SQUASHED_COMMIT"
-    git rebase --onto $SQUASHED_COMMIT $BRANCH
+    git rebase --update-refs --onto $SQUASHED_COMMIT $BRANCH
 }
 
 function find_matching_squashed_commit() {
-    BRANCH=$1
-    git checkout $BRANCH
-    for commit in $(git rev-list main); do
-        AUTHOR=$(git log --format='%ae' -n 1 $commit)
-        if [[ "$AUTHOR" == *"jboulter"* ]]; then
-            echo "Checking $commit..." >&2
-            git cherry-pick --no-commit $commit $BRANCH &> /dev/null
-            if [ -z "$(git status --porcelain)" ]; then
+    # Locate the commit on main that represents the squashed version of the
+    # given feature BRANCH. Works even when caller is on a different branch –
+    # we temporarily check out the base branch, do the check, then restore the
+    # original HEAD before returning so the caller's branch context is
+    # preserved.
+
+    local BRANCH=$1
+    if [[ -z "$BRANCH" ]]; then
+        echo "find_matching_squashed_commit: no branch supplied" >&2
+        return 1
+    fi
+
+    # Remember where we started so we can restore it later (may be detached).
+    local ORIG_REF
+    ORIG_REF=$(git symbolic-ref --quiet --short HEAD 2>/dev/null || git rev-parse --quiet --verify HEAD)
+
+    # Switch to the branch being searched (quietly).
+    git checkout --quiet "$BRANCH" || return 1
+
+    local USER_EMAIL
+    USER_EMAIL=$(git config user.email)
+
+    local _xtrace_was_on=0
+    case "$-" in *x*) _xtrace_was_on=1; set +x ;; esac
+
+    for commit in $(git rev-list --author="$USER_EMAIL" --max-count=1000 main); do
+        echo "Checking $commit..." >&2
+
+        if git cherry-pick --quiet --no-commit "$commit" 2>/dev/null; then
+            if git diff --cached --quiet && git diff --quiet; then
                 echo "Found matching commit on main: $commit" >&2
+                git reset --hard --quiet
+                [[ $_xtrace_was_on -eq 1 ]] && set -x
+                # Restore original HEAD before returning
+                git checkout --quiet "$ORIG_REF" 2>/dev/null || git checkout --quiet -
                 echo "$commit"
-                break
+                return 0
             fi
-            git cherry-pick --abort &> /dev/null
-            git reset --hard --quiet
         fi
+        git cherry-pick --abort >/dev/null 2>&1 || true
+        git reset --hard --quiet
     done
+
+    [[ $_xtrace_was_on -eq 1 ]] && set -x
+    git checkout --quiet "$ORIG_REF" 2>/dev/null || git checkout --quiet -
+    echo "No matching squashed commit found on main" >&2
+    return 1
 }

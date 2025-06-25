@@ -73,8 +73,9 @@ M.setup = function ()
   -- [[ Configure neo-tree ]]
   -- See `:help neo-tree`
 
-  nmap("<leader>tf", "<Cmd>Neotree<CR>", { desc = "Neo[T]ree [F]ilesystem" })
-  nmap("<leader>tg", "<Cmd>Neotree<CR>", { desc = "Neo[T]ree [G]it Status" })
+  nmap("<leader>tf", "<Cmd>Neotree filesystem<CR>", { desc = "Neo[T]ree [F]ilesystem" })
+  nmap("<leader>tg", "<Cmd>Neotree git_status<CR>", { desc = "Neo[T]ree [G]it Status" })
+  nmap("<leader>tb", "<Cmd>Neotree buffers<CR>", { desc = "Neo[T]ree [B]uffers" })
 end
 
 M.setLspMaps = function(_, bufnr)

@@ -25,6 +25,30 @@ if not vim.loop.fs_stat(lazypath) then
 end
 vim.opt.rtp:prepend(lazypath)
 
+-- Enable the following language servers
+--  Feel free to add/remove any LSPs that you want here. They will automatically be installed.
+--
+--  Add any additional override configuration in the following tables. They will be passed to
+--  the `settings` field of the server config. You must look up that documentation yourself.
+--
+--  If you want to override the default filetypes that your language server will attach to you can
+--  define the property "filetypes" to the map in question.
+local servers = {
+  -- clangd = {},
+  -- gopls = {},
+  -- pyright = {},
+  -- rust_analyzer = {},
+  -- tsserver = {},
+  -- html = { filetypes = { "html", "twig", "hbs"} },
+
+  lua_ls = {
+    Lua = {
+      workspace = { checkThirdParty = false },
+      telemetry = { enable = false },
+    },
+  },
+}
+
 -- NOTE: Here is where you install your plugins.
 --  You can configure plugins using the `config` key.
 --
@@ -43,12 +67,15 @@ require("lazy").setup({
   -- NOTE: This is where your plugins related to LSP can be installed.
   --  The configuration is done below. Search for lspconfig to find it below.
   {
+    "mason-org/mason-lspconfig.nvim",
+    opts = {
+      ensure_installed = vim.tbl_keys(servers),
+    },
     -- LSP Configuration & Plugins
-    "neovim/nvim-lspconfig",
     dependencies = {
       -- Automatically install LSPs to stdpath for neovim
-      { "williamboman/mason.nvim", config = true },
-      "williamboman/mason-lspconfig.nvim",
+      { "mason-org/mason.nvim", opts = {} },
+      "neovim/nvim-lspconfig",
 
       -- Useful status updates for LSP
       -- NOTE: `opts = {}` is the same as calling `require("fidget").setup({})`
@@ -129,12 +156,16 @@ require("lazy").setup({
     -- See `:help lualine.txt`
     opts = {
       options = {
-        icons_enabled = false,
+        icons_enabled = true,
         theme = "monokai-pro",
         component_separators = "|",
         section_separators = "",
       },
+      sections = {
+        lualine_x = { function() return vim.fn["codeium#GetStatusString"]() end, "encoding", "fileformat", "filetype" },
+      },
     },
+    dependencies = { 'nvim-tree/nvim-web-devicons' }
   },
 
   {
@@ -233,7 +264,9 @@ require("lazy").setup({
       close_if_last_window = true,
       auto_clean_after_session_restore = true,
       window = {
-        ["t"] = nil,
+        mappings = {
+          ["<space>"] = "noop",
+        }
       },
       filesystem = {
         filtered_items = {
@@ -279,7 +312,7 @@ require("lazy").setup({
   },
   {
     "github/copilot.vim"
-  }
+  },
 }, {})
 
 -- [[ Setting options ]]
@@ -457,54 +490,12 @@ local on_attach = function(_, bufnr)
   end, { desc = "Format current buffer with LSP" })
 end
 
--- Enable the following language servers
---  Feel free to add/remove any LSPs that you want here. They will automatically be installed.
---
---  Add any additional override configuration in the following tables. They will be passed to
---  the `settings` field of the server config. You must look up that documentation yourself.
---
---  If you want to override the default filetypes that your language server will attach to you can
---  define the property "filetypes" to the map in question.
-local servers = {
-  -- clangd = {},
-  -- gopls = {},
-  -- pyright = {},
-  -- rust_analyzer = {},
-  -- tsserver = {},
-  -- html = { filetypes = { "html", "twig", "hbs"} },
-
-  lua_ls = {
-    Lua = {
-      workspace = { checkThirdParty = false },
-      telemetry = { enable = false },
-    },
-  },
-}
-
 -- Setup neovim lua configuration
 require("neodev").setup()
 
 -- nvim-cmp supports additional completion capabilities, so broadcast that to servers
 local capabilities = vim.lsp.protocol.make_client_capabilities()
 capabilities = require("cmp_nvim_lsp").default_capabilities(capabilities)
-
--- Ensure the servers above are installed
-local mason_lspconfig = require "mason-lspconfig"
-
-mason_lspconfig.setup {
-  ensure_installed = vim.tbl_keys(servers),
-}
-
-mason_lspconfig.setup_handlers {
-  function(server_name)
-    require("lspconfig")[server_name].setup {
-      capabilities = capabilities,
-      on_attach = on_attach,
-      settings = servers[server_name],
-      filetypes = (servers[server_name] or {}).filetypes,
-    }
-  end
-}
 
 local sourcekit_cmd = vim.fn.system { "xcrun",  "--find", "sourcekit-lsp" }
 sourcekit_cmd = sourcekit_cmd:gsub("\n", "")
@@ -594,3 +585,4 @@ require("keymaps").setup()
 require("ibl").update { indent = { highlight = highlight } }
 -- The line beneath this is called `modeline`. See `:help modeline`
 -- vim: ts=2 sts=2 sw=2 et
+
