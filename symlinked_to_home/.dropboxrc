@@ -173,7 +173,22 @@ function git_cleanup_squash_merged() {
         return 1
     fi
     echo "Found squashed commit: $SQUASHED_COMMIT"
-    git rebase --update-refs --onto $SQUASHED_COMMIT $BRANCH
+    echo "--- Commit details ---------------------------"
+    git --no-pager log -1 --color --pretty=format:'%C(auto)%h %d %s%nAuthor: %an <%ae>%nDate:   %ad' --date=short "$SQUASHED_COMMIT"
+    echo "----------------------------------------------"
+
+    echo "About to start an interactive rebase onto the squashed commit."
+    echo "Command: git rebase -i --update-refs --onto $SQUASHED_COMMIT $BRANCH"
+
+    local _confirm
+    # Read from the controlling terminal so the prompt always appears even if
+    # stdin is being piped from somewhere else.
+    read -r -p "Proceed? [Y/n] " _confirm < /dev/tty
+    case "$_confirm" in
+        [nN][nN]*) echo "Aborted by user." >&2; return 1 ;;
+    esac
+
+    git rebase -i --update-refs --onto "$SQUASHED_COMMIT" "$(git merge-base HEAD $BRANCH)"
 }
 
 function find_matching_squashed_commit() {
@@ -211,6 +226,7 @@ function find_matching_squashed_commit() {
                 git reset --hard --quiet
                 [[ $_xtrace_was_on -eq 1 ]] && set -x
                 # Restore original HEAD before returning
+                git cherry-pick --abort >/dev/null 2>&1 || true
                 git checkout --quiet "$ORIG_REF" 2>/dev/null || git checkout --quiet -
                 echo "$commit"
                 return 0
