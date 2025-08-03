@@ -8,3 +8,4 @@ quick-terminal-screen = macos-menu-bar
 quick-terminal-animation-duration = 0
 initial-window = false
 theme = "Monokai Remastered"
+keybind = shift+enter=text:\n
