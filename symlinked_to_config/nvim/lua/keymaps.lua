@@ -64,9 +64,9 @@ M.setup = function ()
   -- nmap("]d", vim.diagnostic.goto_next, { desc = "Go to next diagnostic message" })
   -- nmap("<leader>e", vim.diagnostic.open_float, { desc = "Open floating diagnostic message" })
   -- nmap("<leader>q", vim.diagnostic.setloclist, { desc = "Open diagnostics list" })
-  nmap("<leader>tt", "<Cmd>TroubleToggle document_diagnostics<CR>", { desc = "[T]rouble [T]oggle" })
-  nmap("<leader>tw", "<Cmd>TroubleToggle workspace_diagnostics<CR>", { desc = "[T]rouble [T]oggle" })
-  nmap("<leader>tq", "<Cmd>TroubleToggle quickfix<CR>", { desc = "[T]rouble [Q]uickfix" })
+  nmap("<leader>tt", "<Cmd>Trouble diagnostics toggle<CR>", { desc = "[T]rouble [T]oggle" })
+  nmap("<leader>tw", "<Cmd>Trouble diagnostics toggle filter.buf=0<CR>", { desc = "[T]rouble [T]oggle" })
+  nmap("<leader>tq", "<Cmd>Trouble quickfix<CR>", { desc = "[T]rouble [Q]uickfix" })
   nmap("<leader>tn", function() require("trouble").next({skip_groups = true, jump = true }) end, { desc = "[T]rouble [N]ext" })
   nmap("<leader>tp", function() require("trouble").next({skip_groups = true, jump = true }) end, { desc = "[T]rouble [P]revious" })
 
@@ -76,6 +76,9 @@ M.setup = function ()
   nmap("<leader>tf", "<Cmd>Neotree filesystem<CR>", { desc = "Neo[T]ree [F]ilesystem" })
   nmap("<leader>tg", "<Cmd>Neotree git_status<CR>", { desc = "Neo[T]ree [G]it Status" })
   nmap("<leader>tb", "<Cmd>Neotree buffers<CR>", { desc = "Neo[T]ree [B]uffers" })
+
+  -- [[ claude-code.nvim ]]
+  nmap("<leader>cc", "<Cmd>ClaudeCode<CR>", { desc = "Toggle [C]laude [C]ode" })
 end
 
 M.setLspMaps = function(_, bufnr)

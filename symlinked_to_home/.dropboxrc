@@ -2,17 +2,14 @@
 
 alias db='cd ~/src/xplat/'
 alias db2='cd ~/src/xplat2/'
-alias dbmake='./submodule_update.sh && make project_dbapp && open buck-out/gen/dbapp-ios/Dropbox/Dropbox.xcodeproj'
-alias cupmake='./submodule_update.sh && make project_cup && open buck-out/gen/ios/cup/app/Cup.xcodeproj/project.xcworkspace'
+alias db3='cd ~/src/xplat3/'
 alias dbtags='git for-each-ref --shell --sort=creatordate --format="%(refname:short) ->  %(creatordate:format:%x ~ %X %z)" | grep dbapp-ios/'
 alias ghd='gh dbx'
 alias gpr='gh dbx pr'
 alias gprf='gh dbx pr --force-push'
+alias gprd='gh dbx pr --draft'
 alias ghdm='gh dbx merge --keep-branch'
 alias land='gh dbx land --keep-branch'
-
-alias arcpaste='git diff master | arc paste --'
-alias mkbuild='arc test xplat_dbapp_ios_and_upload_vm'
 
 alias gen='./ios_gen_module_project -o'
 alias td='./td'

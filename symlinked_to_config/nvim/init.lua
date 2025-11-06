@@ -9,6 +9,9 @@
 vim.g.mapleader = " "
 vim.g.maplocalleader = " "
 
+-- Fonts
+vim.o.guifont = "BerkeleyMono Nerd Font Mono"
+
 -- Install package manager
 --    https://github.com/folke/lazy.nvim
 --    `:help lazy.nvim.txt` for more info
@@ -102,7 +105,7 @@ require("lazy").setup({
     },
     opts = {
       completion = {
-        autocomplete = false,
+        -- autocomplete = false,
       }
     }
   },
@@ -250,6 +253,8 @@ require("lazy").setup({
 
   {
     "folke/trouble.nvim",
+    opts = {},
+    cmd = "Trouble",
     dependencies = { "nvim-tree/nvim-web-devicons" },
   },
   {
@@ -311,7 +316,13 @@ require("lazy").setup({
     },
   },
   {
-    "github/copilot.vim"
+    "greggh/claude-code.nvim",
+    dependencies = {
+      "nvim-lua/plenary.nvim",
+    },
+    config = function ()
+      require("claude-code").setup( { window = { split_ratio = 0.2, position = "botright vsplit" } } )
+    end
   },
 }, {})
 
@@ -400,7 +411,7 @@ pcall(require("telescope").load_extension, "fzf")
 -- See `:help nvim-treesitter`
 require("nvim-treesitter.configs").setup {
   -- Add languages to be installed here that you want installed for treesitter
-  ensure_installed = { "c", "cpp", "go", "lua", "python", "rust", "vimdoc", "vim", "swift", "objc", "ruby" },
+  ensure_installed = { "c", "cpp", "go", "lua", "python", "rust", "vimdoc", "vim", "swift", "objc", "ruby", "bash" },
 
   -- Autoinstall languages that are not installed. Defaults to false (but you can change for yourself!)
   auto_install = true,
@@ -497,15 +508,20 @@ require("neodev").setup()
 local capabilities = vim.lsp.protocol.make_client_capabilities()
 capabilities = require("cmp_nvim_lsp").default_capabilities(capabilities)
 
+-- setup neovim lsps using neovim's builtin syntax
+
+vim.lsp.enable "bashls"
+
+vim.lsp.config.starpls = {
+  filetypes = { "bzl", "bazel", "buck" }
+}
+vim.lsp.enable "starpls"
+
+
 local sourcekit_cmd = vim.fn.system { "xcrun",  "--find", "sourcekit-lsp" }
 sourcekit_cmd = sourcekit_cmd:gsub("\n", "")
-
-require("lspconfig").sourcekit.setup {
+vim.lsp.config.sourcekit = {
   cmd = { sourcekit_cmd }
-}
-
-require("lspconfig").starpls.setup {
-  filetypes = { "bzl", "bazel", "buck" }
 }
 
 -- [[ Configure nvim-cmp ]]
