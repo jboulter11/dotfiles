@@ -6,7 +6,7 @@ background-opacity = 0.9
 background-blur-radius = 20
 quick-terminal-screen = macos-menu-bar
 quick-terminal-animation-duration = 0
-quick-terminal-size = 100%
+quick-terminal-size = 100%,100%
 initial-window = false
 theme = "Monokai Remastered"
 keybind = shift+enter=text:\n

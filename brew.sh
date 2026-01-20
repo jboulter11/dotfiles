@@ -45,7 +45,7 @@ brew install --cask paw
 brew install --cask bettertouchtool
 brew install --cask meetingbar
 brew install --cask karabiner-elements
-brew install --cask xcodes
+brew install xcodesorg/made/xcodes
 brew install neovim
 brew install --cask readdle-spark
 brew install --cask fertigt-slate
@@ -59,6 +59,8 @@ brew install --cask proxyman
 brew install --cask hiddenbar
 brew install --cask beekeeper-studio
 brew install --cask ghostty
+brew install neovide
+brew install lazygit
 
 # xcode commandline tools
 sudo xcode-select --install
