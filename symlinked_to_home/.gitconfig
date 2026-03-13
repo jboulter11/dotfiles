@@ -1,0 +1,60 @@
+# Machine-specific config (email, etc.) lives in ~/.gitconfig-local
+# Run setup.sh -> "Configure git email" to set it
+[include]
+	path = ~/.gitconfig-local
+
+[user]
+	name = Jim Boulter
+
+[includeIf "hasconfig:remote.*.url:git@github.com:dropbox-internal/*"]
+	path = .gitconfig-dbx
+
+[merge]
+	tool = Kaleidoscope
+	conflictStyle = zdiff3
+
+[diff]
+	tool = Kaleidoscope
+
+[difftool "Kaleidoscope"]
+	cmd = ksdiff --partial-changeset --relative-path \"$MERGED\" -- \"$LOCAL\" \"$REMOTE\"
+
+[difftool]
+	prompt = false
+	trustExitCode = true
+
+[mergetool "Kaleidoscope"]
+	cmd = ksdiff --merge --output \"$MERGED\" --base \"$BASE\" -- \"$LOCAL\" --snapshot \"$REMOTE\" --snapshot
+	trustExitCode = true
+
+[mergetool]
+	prompt = false
+	keepBackup = false
+
+[alias]
+	append = town append
+	compress = town compress
+	contribute = town contribute
+	diff-parent = town diff-parent
+	down = town down
+	hack = town hack
+	delete = town delete
+	observe = town observe
+	park = town park
+	prepend = town prepend
+	propose = town propose
+	rename = town rename
+	repo = town repo
+	set-parent = town set-parent
+	ship = town ship
+	sync = town sync
+	up = town up
+
+[core]
+	pager = delta
+
+[interactive]
+	diffFilter = delta --color-only
+
+[delta]
+	navigate = true

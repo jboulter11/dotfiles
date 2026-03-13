@@ -65,6 +65,25 @@ editor_themes() {
     fi
 }
 
+configure_git_email () {
+    echo "Select git email:"
+    echo "  1) jboulter11@gmail.com"
+    echo "  2) jboulter@dropbox.com"
+    echo "  3) Enter a custom email"
+    read selection
+    case $selection in
+        1) email="jboulter11@gmail.com" ;;
+        2) email="jboulter@dropbox.com" ;;
+        3) echo "Enter email:"; read email ;;
+        *) echo "$BRed Bad selection$Reset"; return 1 ;;
+    esac
+    cat > "$HOME/.gitconfig-local" <<EOF
+[user]
+	email = $email
+EOF
+    echo "Git email set to $email in ~/.gitconfig-local"
+}
+
 install_tools () {
     if [ "$( echo "$OSTYPE" | grep 'darwin' )" ] ; then
         echo "This utility will install useful utilities using Homebrew"
@@ -115,6 +134,7 @@ all () {
     install_zprezto
     setup_file_system
     link
+    configure_git_email
     editor_themes
     install_tools
     colemak
@@ -128,7 +148,8 @@ menu () {
     $BBlue 4) $Reset Install editor themes
     $BBlue 5) $Reset Install brew packages
     $BBlue 6) $Reset Install Colemak Mod-dh
-    $BGreen 7) $Reset All
+    $BBlue 7) $Reset Configure git email
+    $BGreen 8) $Reset All
     $BRed 0) $Reset Exit"
     read a
     case $a in
@@ -138,7 +159,8 @@ menu () {
         4) editor_themes ; menu ;;
         5) install_tools ; menu ;;
         6) colemak ; menu ;;
-        7) all ; menu ;;
+        7) configure_git_email ; menu ;;
+        8) all ; menu ;;
         0) exit ;;
         *) echo "$BRed Bad selection$Reset" ;
     esac
