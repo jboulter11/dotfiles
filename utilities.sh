@@ -85,5 +85,5 @@ On_ICyan="\033[0;106m"    # Cyan
 On_IWhite="\033[0;107m"   # White
 
 color () {
-    echo -ne $1$2$clear
+    echo -ne $1$2$Reset
 }

@@ -59,7 +59,7 @@ editor_themes() {
         echo "> Xcode detected. ✅"
         echo "> Copying themes ..."
         mkdir -p $THEME_DIR
-        cp "$BASE_DIR/xcode_themes/*.xccolortheme" "$THEME_DIR"
+        cp "$BASE_DIR"/xcode_themes/*.xccolortheme "$THEME_DIR"
         echo "> Done!"
         echo "> You can restart Xcode now."
     else
@@ -109,7 +109,7 @@ colemak () {
         echo "Please logout and login, if needed go to SysPref > Keyboard > Input Sources and enable the keyboard"
         
     else
-        echo "colemake install cancelled by user"
+        echo "colemak install cancelled by user"
     fi
 }
 

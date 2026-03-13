@@ -28,7 +28,6 @@ function vv() {
 }
 
 PATH=$PATH:~/src/GitChildBranchHelpers/bin/
-eval "$(direnv hook zsh)"
 
 ssh-add --apple-use-keychain ~/.ssh/id_ed25519_dbx_github > /dev/null 2>&1
 

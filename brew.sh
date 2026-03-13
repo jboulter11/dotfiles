@@ -13,8 +13,6 @@ if [ ! "$?" -eq 0 ] ; then
 	fi
 fi
 
-git -C $(brew --repo homebrew/core) checkout master
-
 # Make sure we're using the latest Homebrew
 brew update
 

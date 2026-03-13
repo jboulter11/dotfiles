@@ -115,7 +115,6 @@ export PATH="/opt/homebrew/opt/php@7.4/bin:$PATH"
 export PATH="/opt/homebrew/opt/php@7.4/sbin:$PATH"
 
 eval "$(/opt/homebrew/bin/brew shellenv)"
-alias td="./td"
 # load tooldir completions
 fpath+=(~/.zsh/completion)
 autoload -U compinit
