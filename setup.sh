@@ -34,6 +34,18 @@ link () {
             ln -sfv "$filepath" "$HOME/.config/$name"
         done
 
+        # Per-file config symlinks (for config dirs with runtime files we don't track)
+        for dir in "$SCRIPT_DIR"/config_files/*; do
+            local name
+            name=$(basename "$dir")
+            mkdir -p "$HOME/.config/$name"
+            for filepath in "$dir"/*; do
+                local fname
+                fname=$(basename "$filepath")
+                ln -sfv "$filepath" "$HOME/.config/$name/$fname"
+            done
+        done
+
         mkdir -p "$HOME/Library/Application Support/espanso/match/"
         for filepath in "$SCRIPT_DIR"/symlinked_to_espanso/*; do
             local name
