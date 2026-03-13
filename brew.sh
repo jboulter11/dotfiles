@@ -72,9 +72,12 @@ brew install --cask devutils
 brew install --cask fertigt-slate
 brew install --cask ghostty
 brew install --cask hiddenbar
+brew install --cask hopper-disassembler
 brew install --cask iterm2
+brew install --cask kaleidoscope
 brew install --cask karabiner-elements
 brew install --cask keyboard-maestro
+brew install --cask loom
 brew install --cask loopback
 brew install --cask meetingbar
 brew install --cask nslogger
@@ -84,7 +87,9 @@ brew install --cask readdle-spark
 brew install --cask reveal
 brew install --cask roon
 brew install --cask sim-genie
+brew install --cask slack
 brew install --cask visual-studio-code
+brew install --cask vlc
 brew install --cask xcodes-app
 
 # xcode commandline tools
