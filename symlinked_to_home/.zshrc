@@ -27,6 +27,8 @@ alias grc='git rebase --continue'
 alias ga.='git add .'
 alias garc='git add .; git rebase --continue'
 alias gco='git checkout'
+alias gmt='git mergetool'
+alias gdt='git difftool'
 
 alias rmdd='rm -rf $HOME/Library/Developer/Xcode/DerivedData'
 
@@ -118,6 +120,7 @@ alias td="./td"
 fpath+=(~/.zsh/completion)
 autoload -U compinit
 compinit -u
+_comp_options+=(globdots)
 eval "$(pyenv init -)"
 export PATH="/Users/jboulter/.local/share/sentry-devenv/bin:$PATH"
 
@@ -130,3 +133,6 @@ export JAVA_HOME="/Users/jboulter/.dbx_jdk/zulu21.32.17-ca-fx-jdk21.0.2-macosx_a
 # From repo_setup:
 export PATH="$HOME/.pyenv/shims:$PATH"
 export PATH="$HOME/.local/bin:$PATH"
+
+# sentry
+export PATH="$HOME/.sentry/bin:$PATH"

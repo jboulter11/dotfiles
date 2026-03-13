@@ -189,25 +189,13 @@ require("lazy").setup({
 
   -- Fuzzy Finder (files, lsp, etc)
   {
-    "nvim-telescope/telescope.nvim",
-    branch = "0.1.x",
-    dependencies = {
-      "nvim-lua/plenary.nvim",
-      -- Fuzzy Finder Algorithm which requires local dependencies to be built.
-      -- Only load if `make` is available. Make sure you have the system
-      -- requirements installed.
-      {
-        "nvim-telescope/telescope-fzf-native.nvim",
-        -- NOTE: If you are having trouble with this installation,
-        --       refer to the README for telescope-fzf-native for more instructions.
-        build = "make",
-        cond = function()
-          return vim.fn.executable "make" == 1
-        end,
-      },
-    },
+      'nvim-telescope/telescope.nvim', version = '*',
+      dependencies = {
+          'nvim-lua/plenary.nvim',
+          -- optional but recommended
+          { 'nvim-telescope/telescope-fzf-native.nvim', build = 'make' },
+      }
   },
-
   {
     -- Highlight, edit, and navigate code
     "nvim-treesitter/nvim-treesitter",
@@ -306,6 +294,13 @@ require("lazy").setup({
   {
     -- DiffView to show diff or resolve conflicts in nvim
     "sindrets/diffview.nvim",
+    opts = {
+      view = {
+        merge_tool = {
+          layout = "diff3_mixed",
+        },
+      },
+    },
   },
   {
     -- ToggleTerm - Toggle-able terminal view within nvim
@@ -316,13 +311,34 @@ require("lazy").setup({
     },
   },
   {
-    "greggh/claude-code.nvim",
-    dependencies = {
-      "nvim-lua/plenary.nvim",
+    "coder/claudecode.nvim",
+    dependencies = { "folke/snacks.nvim" },
+    config = true,
+    keys = {
+      { "<leader>c", nil, desc = "AI/Claude Code" },
+      { "<leader>cc", "<cmd>ClaudeCode<cr>", desc = "Toggle Claude" },
+      { "<leader>cf", "<cmd>ClaudeCodeFocus<cr>", desc = "Focus Claude" },
+      { "<leader>cr", "<cmd>ClaudeCode --resume<cr>", desc = "Resume Claude" },
+      { "<leader>cC", "<cmd>ClaudeCode --continue<cr>", desc = "Continue Claude" },
+      { "<leader>cm", "<cmd>ClaudeCodeSelectModel<cr>", desc = "Select Claude model" },
+      { "<leader>cb", "<cmd>ClaudeCodeAdd %<cr>", desc = "Add current buffer" },
+      { "<leader>cs", "<cmd>ClaudeCodeSend<cr>", mode = "v", desc = "Send to Claude" },
+      {
+        "<leader>cs",
+        "<cmd>ClaudeCodeTreeAdd<cr>",
+        desc = "Add file",
+        ft = { "NvimTree", "neo-tree", "oil", "minifiles", "netrw" },
+      },
+      -- Diff management
+      { "<leader>ca", "<cmd>ClaudeCodeDiffAccept<cr>", desc = "Accept diff" },
+      { "<leader>cd", "<cmd>ClaudeCodeDiffDeny<cr>", desc = "Deny diff" },
     },
-    config = function ()
-      require("claude-code").setup( { window = { split_ratio = 0.2, position = "botright vsplit" } } )
-    end
+    opts = {
+      diff_opts = {
+        auto_close_on_decline = true,
+        open_in_current_tab = false,
+      },
+    },
   },
 }, {})
 
@@ -401,6 +417,11 @@ require("telescope").setup {
       },
     },
     borderchars = { "█", " ", "▀", "█", "█", " ", " ", "▀" },
+  },
+  pickers = {
+    find_files = {
+      follow = true
+    }
   },
 }
 
