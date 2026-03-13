@@ -1,9 +1,8 @@
-#!/bin/sh
+#!/bin/bash
 
-SCRIPT_PATH="$(readlink -f "$0")"
-BASE_DIR="$(dirname "$SCRIPT_PATH")"
+SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
 
-source "$BASE_DIR/utilities.sh"
+source "$SCRIPT_DIR/utilities.sh"
 
 # Setup FS
 setup_file_system () {
@@ -21,18 +20,25 @@ setup_file_system () {
 link () {
     echo "This utility will symlink the files in this repo to the home directory"
     if user_ack ; then
-        for file in $( ls -A symlinked_to_home/ ) ; do
-            ln -sv "$BASE_DIR/symlinked_to_home/$file" "$HOME"
+        for filepath in "$SCRIPT_DIR"/symlinked_to_home/.* "$SCRIPT_DIR"/symlinked_to_home/*; do
+            local name
+            name=$(basename "$filepath")
+            [[ "$name" == "." || "$name" == ".." ]] && continue
+            ln -sfv "$filepath" "$HOME/$name"
         done
 
         mkdir -p "$HOME/.config"
-        for file in $( ls -A symlinked_to_config/ ) ; do
-                ln -sv "$BASE_DIR/symlinked_to_config/$file" "$HOME/.config"
+        for filepath in "$SCRIPT_DIR"/symlinked_to_config/*; do
+            local name
+            name=$(basename "$filepath")
+            ln -sfv "$filepath" "$HOME/.config/$name"
         done
 
         mkdir -p "$HOME/Library/Application Support/espanso/match/"
-        for file in $( ls -A symlinked_to_espanso/ ) ; do
-            ln -sv "$BASE_DIR/symlinked_to_espanso/$file" "$HOME/Library/Application Support/espanso/match"
+        for filepath in "$SCRIPT_DIR"/symlinked_to_espanso/*; do
+            local name
+            name=$(basename "$filepath")
+            ln -sfv "$filepath" "$HOME/Library/Application Support/espanso/match/$name"
         done
 
         echo "Symlinking complete"
@@ -43,27 +49,19 @@ link () {
 }
 
 editor_themes() {
-    # Copy Vim color scheme
-    # Symlinking doesn't seem to work for this
-    mkdir "$HOME/.vim"
-    mkdir "$HOME/.vim/colors"
-    cp  "monokai.vim" "$HOME/.vim/colors/monokai.vim"
-    git clone https://github.com/VundleVim/Vundle.vim.git ~/.vim/bundle/Vundle.vim
-    vim +PluginInstall +qall
-    
     # xcode themes
     THEME_DIR="$HOME/Library/Developer/Xcode/UserData/FontAndColorThemes/"
 
     if [ -d ~/Library/Developer/Xcode ]
     then
-        echo "> Xcode detected. ✅"
+        echo "> Xcode detected."
         echo "> Copying themes ..."
-        mkdir -p $THEME_DIR
-        cp "$BASE_DIR"/xcode_themes/*.xccolortheme "$THEME_DIR"
+        mkdir -p "$THEME_DIR"
+        cp "$SCRIPT_DIR"/xcode_themes/*.xccolortheme "$THEME_DIR"
         echo "> Done!"
         echo "> You can restart Xcode now."
     else
-        echo "Xcode doesn't seem to be installed on your computer. 🚨"
+        echo "Xcode doesn't seem to be installed on your computer."
     fi
 }
 
@@ -86,7 +84,7 @@ install_zprezto () {
     if user_ack ; then
         echo "Installing zprezto and setting prompt."
         zsh zprezto.sh
-        
+
         echo "Setting zsh as default shell."
         chsh -s /bin/zsh
     else
@@ -107,7 +105,7 @@ colemak () {
         popd || exit 1
 
         echo "Please logout and login, if needed go to SysPref > Keyboard > Input Sources and enable the keyboard"
-        
+
     else
         echo "colemak install cancelled by user"
     fi

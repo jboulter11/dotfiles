@@ -11,8 +11,6 @@ prompt sorin
 
 # Customize to your needs...
 ##Start env config
-#export CLICOLOR=1
-export TERM=xterm-256color
 
 #Aliases
 alias gst='git status'
@@ -46,9 +44,6 @@ function simVideo() {
     xcrun simctl io booted recordVideo "$@"
 }
 
-# altool
-PATH=$PATH:/Applications/Xcode.app/Contents/Applications/Application\ Loader.app/Contents/Frameworks/ITunesSoftwareService.framework/Support/
-
 function killCoreAudio() {
     sudo pkill -9 coreaudiod
 }
@@ -62,17 +57,6 @@ function incognito() {
     open -na "Google Chrome" --args --incognito $@
 }
 
-function mkBuck() {
-    echo "load(\"//BuckRules:buck_rule_macros.bzl\", \"first_party_lib\")\n\n" >| "$1/BUCK"
-    vim $1/BUCK
-}
-
-function buckproj() {
-    output=$(buck project --combined-project --without-dependencies-tests --show-output $@)
-    file=$(echo $output | sed -En 's/^.*(buck\-out\/gen\/.+)$/\1/p')
-    open $file
-}
-
 function replace() {
   local pattern="$1"
   local replacement="$2"
@@ -81,11 +65,19 @@ function replace() {
   escaped_pattern=$(escape_for_sed "$pattern")
   escaped_replacement=$(escape_for_sed "$replacement")
 
-  if [[ "$3" == "-s" ]]; then
-    rg "$escaped_pattern" --files-with-matches | xargs sed -i "" "s/$escaped_pattern/$escaped_replacement/g"
-  else
-    rg "$escaped_pattern" --files-with-matches | xargs sed -i "" "s/$escaped_pattern/$escaped_replacement/g" | tee /dev/tty
+  local files
+  files=$(rg "$escaped_pattern" --files-with-matches)
+
+  if [[ -z "$files" ]]; then
+    echo "No files matched."
+    return 1
   fi
+
+  if [[ "$3" != "-s" ]]; then
+    echo "$files"
+  fi
+
+  echo "$files" | xargs sed -i "" "s/$escaped_pattern/$escaped_replacement/g"
 
   find . -type f -name "*.bak" -delete
 }
@@ -97,10 +89,10 @@ function escape_for_sed() {
 [ -f ~/.fzf.zsh ] && source ~/.fzf.zsh
 
 # From repo_setup:
-export ANDROID_HOME="/Users/jboulter/Library/Android/sdk"
-export ANDROID_NDK_HOME="/Users/jboulter/Library/Android/ndk"
-export ANDROID_NDK="/Users/jboulter/Library/Android/ndk"
-export PATH="/Users/jboulter/Library/Android/sdk/platform-tools:/Users/jboulter/Library/Android/sdk/tools:/Users/jboulter/Library/Android/ndk:$PATH"
+export ANDROID_HOME="$HOME/Library/Android/sdk"
+export ANDROID_NDK_HOME="$HOME/Library/Android/ndk"
+export ANDROID_NDK="$HOME/Library/Android/ndk"
+export PATH="$ANDROID_HOME/platform-tools:$ANDROID_HOME/tools:$ANDROID_NDK:$PATH"
 
 # rbenv
 eval "$(rbenv init - zsh)"
@@ -121,14 +113,14 @@ autoload -U compinit
 compinit -u
 _comp_options+=(globdots)
 eval "$(pyenv init -)"
-export PATH="/Users/jboulter/.local/share/sentry-devenv/bin:$PATH"
+export PATH="$HOME/.local/share/sentry-devenv/bin:$PATH"
 
 
 eval "$(direnv hook zsh)"
 
 export BAZEL=1
 # From repo_setup:
-export JAVA_HOME="/Users/jboulter/.dbx_jdk/zulu21.32.17-ca-fx-jdk21.0.2-macosx_aarch64"
+export JAVA_HOME="$HOME/.dbx_jdk/zulu21.32.17-ca-fx-jdk21.0.2-macosx_aarch64"
 # From repo_setup:
 export PATH="$HOME/.pyenv/shims:$PATH"
 export PATH="$HOME/.local/bin:$PATH"
