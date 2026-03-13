@@ -15,52 +15,77 @@ fi
 
 git -C $(brew --repo homebrew/core) checkout master
 
-# Make sure we’re using the latest Homebrew
+# Make sure we're using the latest Homebrew
 brew update
 
-# Install
-brew install zsh
-brew install tmux
-brew install fzf
-brew install swift-sh
-brew install ripgrep
-brew install pyenv
-brew install --cask alfred
+# Formulae
+brew install aria2
+brew install awscli
+brew install bazelisk
+brew install cocoapods
+brew install coreutils
+brew install direnv
 brew install fd
-brew install sourcery
+brew install fzf
+brew install gh
+brew install git-delta
+brew install git-town
+brew install go
+brew install graphviz
+brew install imagemagick
+brew install jq
+brew install just
+brew install lazygit
+brew install lcov
+brew install luarocks
+brew install neovide
+brew install neovim
+brew install node
+brew install pyenv
 brew install rbenv
+brew install ripgrep
+brew install rsync
 brew install shellcheck
 brew install socat
-brew install --cask sim-genie
-brew install --cask 1password
-brew install --cask 1password/tap/1password-cli
-brew install --cask iterm2
-brew install --cask visual-studio-code
-brew install --cask deckset
-brew install --cask roon
-brew install --cask loopback
-brew install --cask reveal
-brew install --cask nslogger
-brew install --cask paw
-brew install --cask bettertouchtool
-brew install --cask meetingbar
-brew install --cask karabiner-elements
+brew install sourcery
+brew install swift-sh
+brew install swiftformat
+brew install tmux
+brew install tree-sitter-cli
+brew install uv
+brew install withered-magic/brew/starpls
 brew install xcodesorg/made/xcodes
-brew install neovim
-brew install --cask readdle-spark
-brew install --cask fertigt-slate
-brew install --cask obsidian
-brew install devutils
-brew install --cask copilot-for-xcode
-brew install gh
-brew install --cask keyboard-maestro
+brew install zsh
+
+# Casks
+brew install --cask 1password
+brew install --cask 1password-cli
+brew install --cask alfred
 brew install --cask arc
-brew install --cask proxyman
-brew install --cask hiddenbar
 brew install --cask beekeeper-studio
+brew install --cask bettertouchtool
+brew install --cask cmux
+brew install --cask copilot-for-xcode
+brew install --cask cursor
+brew install --cask deckset
+brew install --cask devutils
+brew install --cask fertigt-slate
 brew install --cask ghostty
-brew install neovide
-brew install lazygit
+brew install --cask hiddenbar
+brew install --cask iterm2
+brew install --cask karabiner-elements
+brew install --cask keyboard-maestro
+brew install --cask loopback
+brew install --cask meetingbar
+brew install --cask nslogger
+brew install --cask obsidian
+brew install --cask proxyman
+brew install --cask readdle-spark
+brew install --cask reveal
+brew install --cask roon
+brew install --cask sim-genie
+brew install --cask visual-studio-code
+brew install --cask xcodes-app
 
 # xcode commandline tools
 sudo xcode-select --install
@@ -69,4 +94,4 @@ sudo xcode-select --install
 "$(brew --prefix)"/opt/fzf/install
 
 # Xcodes Themes
-cp xcode_themes/*.xccolortheme ~/Library/Developer/Xcode/UserData/FontAndColorThemes/ 
+cp xcode_themes/*.xccolortheme ~/Library/Developer/Xcode/UserData/FontAndColorThemes/
