@@ -124,12 +124,9 @@ export JAVA_HOME="$HOME/.dbx_jdk/zulu21.32.17-ca-fx-jdk21.0.2-macosx_aarch64"
 # From repo_setup:
 export PATH="$HOME/.pyenv/shims:$PATH"
 export PATH="$HOME/.local/bin:$PATH"
-<<<<<<< Updated upstream
 
 # sentry
 export PATH="$HOME/.sentry/bin:$PATH"
-||||||| Stash base
-=======
 # opencode
 export PATH="$HOME/.opencode/bin:$PATH"
 
@@ -139,4 +136,3 @@ export PATH="$HOME/.opencode/bin:$PATH"
 # bun
 export BUN_INSTALL="$HOME/.bun"
 export PATH="$BUN_INSTALL/bin:$PATH"
->>>>>>> Stashed changes

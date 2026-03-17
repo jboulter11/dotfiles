@@ -46,6 +46,14 @@ link () {
             done
         done
 
+        # Claude Code config (per-file into ~/.claude/)
+        mkdir -p "$HOME/.claude"
+        for filepath in "$SCRIPT_DIR"/config_files/claude/*; do
+            local fname
+            fname=$(basename "$filepath")
+            ln -sfv "$filepath" "$HOME/.claude/$fname"
+        done
+
         mkdir -p "$HOME/Library/Application Support/espanso/match/"
         for filepath in "$SCRIPT_DIR"/symlinked_to_espanso/*; do
             local name
