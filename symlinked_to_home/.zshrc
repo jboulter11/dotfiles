@@ -18,7 +18,6 @@ alias gpl='git pull'
 alias gb='git branch'
 alias gac='git add .; git commit -m'
 alias gd='git diff'
-alias pi='pod install'
 alias gfm='git fetch origin main:main'
 alias gfmr='gfm && git rebase main'
 alias grc='git rebase --continue'
@@ -32,6 +31,7 @@ alias rmdd='rm -rf $HOME/Library/Developer/Xcode/DerivedData'
 
 alias lg='lazygit'
 alias nv='neovide --fork'
+alias pl='park'
 
 source ~/.dropboxrc
 
@@ -84,6 +84,51 @@ function replace() {
 
 function escape_for_sed() {
   echo "$1" | sed 's/[\^\/]/\\&/g'
+}
+
+function park() {
+    local G=$'\033[0;32m' Y=$'\033[0;33m' R=$'\033[0;31m' C=$'\033[0;36m' N=$'\033[0m'
+
+    local worktree_dir
+    worktree_dir=$(basename "$(git rev-parse --show-toplevel 2>/dev/null)") || {
+        echo "${R}❌ Not in a git repository${N}"
+        return 1
+    }
+
+    # Determine the main worktree name to detect numbered variants
+    local main_worktree
+    main_worktree=$(basename "$(cd "$(git rev-parse --git-common-dir)" && cd .. && pwd)")
+
+    local pl_branch
+    if [[ "$worktree_dir" == "$main_worktree" ]]; then
+        pl_branch="pl"
+    elif [[ "$worktree_dir" =~ ^${main_worktree}([0-9]+)$ ]]; then
+        pl_branch="pl${match[1]}"
+    else
+        pl_branch="pl-$worktree_dir"
+    fi
+
+    echo "🅿️  Parking ${C}${worktree_dir}${N} → ${C}${pl_branch}${N}"
+
+    # Create parking lot branch from main if it doesn't exist
+    if ! git show-ref --verify --quiet "refs/heads/$pl_branch"; then
+        echo "🌱 Creating ${C}${pl_branch}${N} from main..."
+        git checkout -b "$pl_branch" main || return 1
+    else
+        git checkout "$pl_branch" || return 1
+    fi
+
+    # Fetch main and rebase
+    echo "📡 Fetching main..."
+    git fetch origin main:main || { echo "${Y}⚠️  Fetch failed — parked on ${C}${pl_branch}${N}"; return 0; }
+
+    echo "🔄 Rebasing against main..."
+    if git rebase main; then
+        echo "${G}✅ Parked on ${C}${pl_branch}${G} (rebased against main)${N}"
+    else
+        git rebase --abort
+        echo "${Y}⚠️  Parked on ${C}${pl_branch}${Y} (rebase aborted due to conflicts)${N}"
+    fi
 }
 
 [ -f ~/.fzf.zsh ] && source ~/.fzf.zsh
