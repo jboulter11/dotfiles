@@ -15,7 +15,7 @@ function _prompt_jim_untracked_callback {
   if [[ "$result" == "dirty" ]]; then
     _prompt_jim_git_color="%F{1}"
   else
-    _prompt_jim_git_color="%F{82}"
+    _prompt_jim_git_color="%F{10}"
   fi
   _prompt_jim_color_cache[$_prompt_jim_git_root]="$_prompt_jim_git_color"
   zle && zle reset-prompt
