@@ -6,6 +6,7 @@ source "$SCRIPT_DIR/utilities.sh"
 
 # Setup FS
 setup_file_system () {
+    echo "${Cyan}Setting up file system...$Reset"
     pushd ~ || exit 1
     # Create code directory
     mkdir ~/src
@@ -18,20 +19,20 @@ setup_file_system () {
 # TODO : Delete symlinks to deleted files
 # TODO - add support for -f and --force
 link () {
-    echo "This utility will symlink the files in this repo to the home directory"
+    echo "${Cyan}Symlinking dotfiles...$Reset"
     if user_ack ; then
         for filepath in "$SCRIPT_DIR"/symlinked_to_home/.* "$SCRIPT_DIR"/symlinked_to_home/*; do
             local name
             name=$(basename "$filepath")
             [[ "$name" == "." || "$name" == ".." ]] && continue
-            ln -sfv "$filepath" "$HOME/$name"
+            ln -sfnv "$filepath" "$HOME/$name"
         done
 
         mkdir -p "$HOME/.config"
         for filepath in "$SCRIPT_DIR"/symlinked_to_config/*; do
             local name
             name=$(basename "$filepath")
-            ln -sfv "$filepath" "$HOME/.config/$name"
+            ln -sfnv "$filepath" "$HOME/.config/$name"
         done
 
         # Per-file config symlinks (for config dirs with runtime files we don't track)
@@ -42,7 +43,7 @@ link () {
             for filepath in "$dir"/*; do
                 local fname
                 fname=$(basename "$filepath")
-                ln -sfv "$filepath" "$HOME/.config/$name/$fname"
+                ln -sfnv "$filepath" "$HOME/.config/$name/$fname"
             done
         done
 
@@ -51,14 +52,14 @@ link () {
         for filepath in "$SCRIPT_DIR"/config_files/claude/*; do
             local fname
             fname=$(basename "$filepath")
-            ln -sfv "$filepath" "$HOME/.claude/$fname"
+            ln -sfnv "$filepath" "$HOME/.claude/$fname"
         done
 
         mkdir -p "$HOME/Library/Application Support/espanso/match/"
         for filepath in "$SCRIPT_DIR"/symlinked_to_espanso/*; do
             local name
             name=$(basename "$filepath")
-            ln -sfv "$filepath" "$HOME/Library/Application Support/espanso/match/$name"
+            ln -sfnv "$filepath" "$HOME/Library/Application Support/espanso/match/$name"
         done
 
         echo "Symlinking complete"
@@ -69,7 +70,7 @@ link () {
 }
 
 editor_themes() {
-    # xcode themes
+    echo "${Cyan}Installing editor themes...$Reset"
     THEME_DIR="$HOME/Library/Developer/Xcode/UserData/FontAndColorThemes/"
 
     if [ -d ~/Library/Developer/Xcode ]
@@ -86,6 +87,7 @@ editor_themes() {
 }
 
 configure_git_email () {
+    echo "${Cyan}Configuring git email...$Reset"
     echo "Select git email:"
     echo "  1) jboulter11@gmail.com"
     echo "  2) jboulter@dropbox.com"
@@ -105,6 +107,7 @@ EOF
 }
 
 install_tools () {
+    echo "${Cyan}Installing brew packages...$Reset"
     if [ "$( echo "$OSTYPE" | grep 'darwin' )" ] ; then
         echo "This utility will install useful utilities using Homebrew"
         if user_ack ; then
@@ -119,7 +122,7 @@ install_tools () {
 }
 
 install_zprezto () {
-    echo "This utility will install zprezto, set zsh as default and set jim prompt"
+    echo "${Cyan}Installing zprezto...$Reset"
     if user_ack ; then
         echo "Installing zprezto and setting prompt."
         zsh zprezto.sh
@@ -132,7 +135,7 @@ install_zprezto () {
 }
 
 colemak () {
-    echo "This utility will install colemak mod-dh keyboard layout"
+    echo "${Cyan}Installing Colemak Mod-dh...$Reset"
     if user_ack ; then
         echo "Installing colemak."
         pushd ~/src/ || exit 1
@@ -171,7 +174,7 @@ menu () {
     $BBlue 7) $Reset Configure git email
     $BGreen 8) $Reset All
     $BRed 0) $Reset Exit"
-    read a
+    read -sn1 a
     case $a in
         1) install_zprezto ; menu ;;
         2) setup_file_system ; menu ;;
