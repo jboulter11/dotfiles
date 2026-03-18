@@ -3,6 +3,7 @@
 alias db='cd ~/src/xplat/'
 alias db2='cd ~/src/xplat2/'
 alias db3='cd ~/src/xplat3/'
+alias db4='cd ~/src/xplat4/'
 alias dbtags='git for-each-ref --shell --sort=creatordate --format="%(refname:short) ->  %(creatordate:format:%x ~ %X %z)" | grep dbapp-ios/'
 alias ghd='gh dbx'
 alias gpr='gh dbx pr'
