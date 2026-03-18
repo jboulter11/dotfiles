@@ -20,6 +20,7 @@ setup_file_system () {
 # TODO - add support for -f and --force
 link () {
     echo "${Cyan}Symlinking dotfiles...$Reset"
+    echo "This will symlink the files in this repo to the home directory"
     if user_ack ; then
         for filepath in "$SCRIPT_DIR"/symlinked_to_home/.* "$SCRIPT_DIR"/symlinked_to_home/*; do
             local name
@@ -123,6 +124,7 @@ install_tools () {
 
 install_zprezto () {
     echo "${Cyan}Installing zprezto...$Reset"
+    echo "This will install zprezto, set zsh as default, and set jim prompt"
     if user_ack ; then
         echo "Installing zprezto and setting prompt."
         zsh zprezto.sh
@@ -136,6 +138,7 @@ install_zprezto () {
 
 colemak () {
     echo "${Cyan}Installing Colemak Mod-dh...$Reset"
+    echo "This will install the colemak mod-dh keyboard layout"
     if user_ack ; then
         echo "Installing colemak."
         pushd ~/src/ || exit 1
