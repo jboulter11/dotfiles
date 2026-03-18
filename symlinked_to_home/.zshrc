@@ -7,7 +7,7 @@ export VISUAL=nvim
 
 autoload -Uz promptinit
 promptinit
-prompt sorin
+prompt jim
 
 # Customize to your needs...
 ##Start env config

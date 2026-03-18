@@ -2,7 +2,7 @@
 
 git clone --recursive https://github.com/sorin-ionescu/prezto.git "${ZDOTDIR:-$HOME}/.zprezto"
 
-cp zprezto/prompt_jim_setup "${ZDOTDIR:-$HOME}"/.zprezto/modules/prompt/functions/prompt_jim_setup
+ln -sfnv "$PWD/zprezto/prompt_jim_setup" "${ZDOTDIR:-$HOME}"/.zprezto/modules/prompt/functions/prompt_jim_setup
 
 setopt EXTENDED_GLOB
 for rcfile in "${ZDOTDIR:-$HOME}"/.zprezto/runcoms/^((README.md)|(zshrc)|(zpreztorc))(.N); do

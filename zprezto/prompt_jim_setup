@@ -1,24 +1,63 @@
 #
-# A single line theme with Git information on the left and Ruby on the right.
+# A single line theme with Git information.
 #
 # Author: Jim Boulter <jboulter11@gmail.com>
 #
-# Features:
-#   - Indicates dirty Git repository.
-#   - Indicates the Ruby version.
-#   - Indicates vi modes.
-#
-# Screenshots:
-#   http://i.imgur.com/dCwhynn.png
-#
+
+typeset -gA _prompt_jim_color_cache
+
+function _prompt_jim_untracked_callback {
+  local fd=$1
+  zle -F "$fd"
+  local result
+  read result <&$fd
+  exec {fd}<&-
+  if [[ "$result" == "dirty" ]]; then
+    _prompt_jim_git_color="%F{1}"
+  else
+    _prompt_jim_git_color="%F{82}"
+  fi
+  _prompt_jim_color_cache[$_prompt_jim_git_root]="$_prompt_jim_git_color"
+  zle && zle reset-prompt
+}
 
 function prompt_jim_precmd {
   setopt LOCAL_OPTIONS
   unsetopt XTRACE KSH_ARRAYS
 
-  # Get Git repository information.
-  if (( $+functions[git-info] )); then
-    git-info
+  # Format PWD.
+  _prompt_jim_pwd=$(prompt-pwd)
+
+  # Get branch name and dirty status.
+  local branch
+  branch=$(git symbolic-ref --short HEAD 2>/dev/null)
+  if [[ -n "$branch" ]]; then
+    _prompt_jim_branch="@${branch}"
+    _prompt_jim_git_root=$(git rev-parse --show-toplevel 2>/dev/null)
+    if ! git diff --quiet HEAD -- 2>/dev/null; then
+      # Tracked files are dirty — show red immediately.
+      _prompt_jim_git_color="%F{1}"
+      _prompt_jim_color_cache[$_prompt_jim_git_root]="%F{1}"
+    else
+      # Tracked files are clean — use cached color while async checks untracked.
+      if [[ -n "${_prompt_jim_color_cache[$_prompt_jim_git_root]}" ]]; then
+        _prompt_jim_git_color="${_prompt_jim_color_cache[$_prompt_jim_git_root]}"
+      else
+        _prompt_jim_git_color="%F{255}"
+      fi
+      local fd
+      exec {fd}< <(
+        if [[ -n "$(git ls-files --others --exclude-standard 2>/dev/null | head -1)" ]]; then
+          print dirty
+        else
+          print clean
+        fi
+      )
+      zle -F "$fd" _prompt_jim_untracked_callback
+    fi
+  else
+    _prompt_jim_branch=''
+    _prompt_jim_git_color=''
   fi
 }
 
@@ -30,7 +69,6 @@ function prompt_jim_setup {
   # Load required functions.
   autoload -Uz add-zsh-hook
 
-  # Add hook for calling git-info before each command.
   add-zsh-hook precmd prompt_jim_precmd
 
   # Tell prezto we can manage this prompt
@@ -38,20 +76,15 @@ function prompt_jim_setup {
 
   # Set editor-info parameters.
   zstyle ':prezto:module:editor:info:completing' format '%B%F{cyan}...%f%b'
-  zstyle ':prezto:module:editor:info:keymap:primary' format " %B%F{1}❯%f%F{2}❯%f%F{3}❯%f%b "
+  zstyle ':prezto:module:editor:info:keymap:primary' format " %B%F{1}❯%F{3}❯%F{2}❯%f%b "
   zstyle ':prezto:module:editor:info:keymap:alternate' format " %B%F{2}❮%f%F{3}❮%f%F{1}❮%f%b "
 
-  # Set git-info parameters.
-  zstyle ':prezto:module:git:info' verbose 'no'
-  zstyle ':prezto:module:git:info:branch' format '%%B%F{183}@%b%f%%b'
-  zstyle ':prezto:module:git:info:dirty-branch' format '%%B%F{225}@%b%f%%b'
-  zstyle ':prezto:module:git:info:indexed' format ' '
-  zstyle ':prezto:module:git:info:unindexed' format ' '
-  zstyle ':prezto:module:git:info:untracked' format ' '
-  zstyle ':prezto:module:git:info:keys' format 'prompt' '%b'
+  _prompt_jim_branch=''
+  _prompt_jim_git_color=''
+  _prompt_jim_pwd=''
 
   # Define prompts.
-  PROMPT='%B%F{183}%c%f${git_info:+${(e)git_info[prompt]}}${editor_info[keymap]}%b'
+  PROMPT='%B%F{4}${_prompt_jim_pwd}%f${_prompt_jim_git_color}${_prompt_jim_branch}%f${editor_info[keymap]}%b'
   RPROMPT=''
 }
 
