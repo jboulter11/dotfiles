@@ -136,6 +136,37 @@ install_zprezto () {
     fi
 }
 
+configure_claude () {
+    echo "${Cyan}Configuring Claude Code...$Reset"
+    echo "This will install Claude Code (if needed) and configure settings"
+    if user_ack ; then
+        # Install Claude Code
+        if ! command -v claude &> /dev/null; then
+            echo "Installing Claude Code..."
+            curl -fsSL https://claude.ai/install.sh | bash
+        else
+            echo "Claude Code already installed: $(claude --version)"
+        fi
+
+        # Configure settings
+        local settings_file="$HOME/.claude/settings.json"
+        mkdir -p "$HOME/.claude"
+
+        if [ ! -f "$settings_file" ]; then
+            echo '{}' > "$settings_file"
+        fi
+
+        # Idempotently set statusLine config (preserves all other settings)
+        local tmp
+        tmp=$(jq '.statusLine = {"type": "command", "command": "~/.claude/statusline-command.sh"}' "$settings_file") && \
+            echo "$tmp" > "$settings_file"
+
+        echo "Claude Code settings updated: statusLine configured"
+    else
+        echo "Claude Code configuration cancelled by user"
+    fi
+}
+
 colemak () {
     echo "${Cyan}Installing Colemak Mod-dh...$Reset"
     echo "This will install the colemak mod-dh keyboard layout"
@@ -160,9 +191,10 @@ all () {
     install_zprezto
     setup_file_system
     link
-    configure_git_email
-    editor_themes
     install_tools
+    configure_git_email
+    configure_claude
+    editor_themes
     colemak
 }
 
@@ -171,22 +203,24 @@ menu () {
     $BBlue 1) $Reset Install zprezto
     $BBlue 2) $Reset Setup file system
     $BBlue 3) $Reset Symlink dotfiles
-    $BBlue 4) $Reset Install editor themes
-    $BBlue 5) $Reset Install brew packages
-    $BBlue 6) $Reset Install Colemak Mod-dh
-    $BBlue 7) $Reset Configure git email
-    $BGreen 8) $Reset All
+    $BBlue 4) $Reset Install brew packages
+    $BBlue 5) $Reset Configure git email
+    $BBlue 6) $Reset Configure Claude Code
+    $BBlue 7) $Reset Install editor themes
+    $BBlue 8) $Reset Install Colemak Mod-dh
+    $BGreen 9) $Reset All
     $BRed 0) $Reset Exit"
     read -sn1 a
     case $a in
         1) install_zprezto ; menu ;;
         2) setup_file_system ; menu ;;
         3) link ; menu ;;
-        4) editor_themes ; menu ;;
-        5) install_tools ; menu ;;
-        6) colemak ; menu ;;
-        7) configure_git_email ; menu ;;
-        8) all ; menu ;;
+        4) install_tools ; menu ;;
+        5) configure_git_email ; menu ;;
+        6) configure_claude ; menu ;;
+        7) editor_themes ; menu ;;
+        8) colemak ; menu ;;
+        9) all ; menu ;;
         0) exit ;;
         *) echo "$BRed Bad selection$Reset" ;
     esac
