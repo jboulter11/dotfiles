@@ -29,10 +29,10 @@ function prompt_jim_precmd {
   _prompt_jim_pwd=$(prompt-pwd)
 
   # Get branch name and dirty status.
-  local branch
-  branch=$(git symbolic-ref --short HEAD 2>/dev/null)
-  if [[ -n "$branch" ]]; then
-    _prompt_jim_branch="@${branch}"
+  local ref
+  ref=$(git symbolic-ref --short HEAD 2>/dev/null) || ref="detached"
+  if [[ -n "$ref" ]]; then
+    _prompt_jim_branch="@${ref}"
     _prompt_jim_git_root=$(git rev-parse --show-toplevel 2>/dev/null)
     if ! git diff --quiet HEAD -- 2>/dev/null; then
       # Tracked files are dirty — show red immediately.
