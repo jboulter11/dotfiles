@@ -2,7 +2,8 @@
 
 user_ack () {
     echo "Proceed? (y/n)"
-    read resp
+    read -sn1 resp
+    echo
     [[ "$resp" =~ y|Y ]] && return 0
     return 1
 }
