@@ -100,9 +100,9 @@ function park() {
     main_worktree=$(basename "$(cd "$(git rev-parse --git-common-dir)" && cd .. && pwd)")
 
     local pl_branch
-    if [[ "$worktree_dir" == "$main_worktree" ]]; then
+    if [[ "${worktree_dir:l}" == "${main_worktree:l}" ]]; then
         pl_branch="pl"
-    elif [[ "$worktree_dir" =~ ^${main_worktree}([0-9]+)$ ]]; then
+    elif [[ "${worktree_dir:l}" =~ ^${main_worktree:l}([0-9]+)$ ]]; then
         pl_branch="pl${match[1]}"
     else
         pl_branch="pl-$worktree_dir"
