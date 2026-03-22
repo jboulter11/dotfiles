@@ -120,7 +120,7 @@ function park() {
 
     # Fetch main and rebase
     echo "📡 Fetching main..."
-    git fetch origin main:main || { echo "${Y}⚠️  Fetch failed — parked on ${C}${pl_branch}${N}"; return 0; }
+    git fetch origin main 2>/dev/null && git merge-base --is-ancestor main origin/main && git update-ref refs/heads/main origin/main 2>/dev/null || echo "${Y}⚠️  Fetch failed or main has local commits — rebasing against local main${N}"
 
     echo "🔄 Rebasing against main..."
     if git rebase main; then
