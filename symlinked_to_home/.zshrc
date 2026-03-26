@@ -32,6 +32,7 @@ alias rmdd='rm -rf $HOME/Library/Developer/Xcode/DerivedData'
 alias lg='lazygit'
 alias nv='neovide --fork'
 alias pl='park'
+alias plc='park --clean'
 
 source ~/.dropboxrc
 
@@ -88,6 +89,14 @@ function escape_for_sed() {
 
 function park() {
     local G=$'\033[0;32m' Y=$'\033[0;33m' R=$'\033[0;31m' C=$'\033[0;36m' N=$'\033[0m'
+    local clean=false
+
+    while [[ $# -gt 0 ]]; do
+        case "$1" in
+            --clean|-c) clean=true; shift ;;
+            *) echo "${R}❌ Unknown argument: $1${N}"; return 1 ;;
+        esac
+    done
 
     local worktree_dir
     worktree_dir=$(basename "$(git rev-parse --show-toplevel 2>/dev/null)") || {
@@ -107,6 +116,10 @@ function park() {
     else
         pl_branch="pl-$worktree_dir"
     fi
+
+    # Remember the current branch for --clean
+    local current_branch
+    current_branch=$(git symbolic-ref --short HEAD 2>/dev/null)
 
     echo "🅿️  Parking ${C}${worktree_dir}${N} → ${C}${pl_branch}${N}"
 
@@ -128,6 +141,12 @@ function park() {
     else
         git rebase --abort
         echo "${Y}⚠️  Parked on ${C}${pl_branch}${Y} (rebase aborted due to conflicts)${N}"
+    fi
+
+    # Delete the original branch if --clean was specified
+    if $clean && [[ -n "$current_branch" && "$current_branch" != "$pl_branch" ]]; then
+        echo "🧹 Deleting branch ${C}${current_branch}${N}..."
+        git branch -D "$current_branch"
     fi
 }
 
