@@ -238,3 +238,12 @@ function find_matching_squashed_commit() {
     echo "No matching squashed commit found on main" >&2
     return 1
 }
+
+function new-xplat() {
+    cmux new-workspace
+    "$HOME/src/dotfiles/scripts/cmux-setup-workspace" "$HOME/src/xplat" "just setup ios && just sub"
+}
+
+# cmux workspace hook -- auto-creates xplat worktree + standard pane layout
+# cmux set-hook --unset after-new-workspace
+# cmux set-hook after-new-workspace "$HOME/src/dotfiles/scripts/cmux-setup-workspace $HOME/src/xplat 'just setup ios && just sub'"

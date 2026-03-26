@@ -1,0 +1,106 @@
+#!/bin/bash
+set -euo pipefail
+
+REPO_PATH="$1"
+SETUP_CMDS="${2:-}"
+
+if [ -z "$REPO_PATH" ]; then
+    echo "Usage: cmux-setup-workspace <repo-path> [setup-commands]" >&2
+    exit 1
+fi
+
+# Resolve to absolute path
+REPO_PATH="$(cd "$REPO_PATH" && pwd)"
+BASE_DIR="$(dirname "$REPO_PATH")"
+REPO_NAME="$(basename "$REPO_PATH")"
+
+# Find next available sibling worktree number
+N=2
+while [ -d "${BASE_DIR}/${REPO_NAME}${N}" ]; do
+    ((N++))
+done
+WORKTREE_PATH="${BASE_DIR}/${REPO_NAME}${N}"
+WORKTREE_NAME="${REPO_NAME}${N}"
+
+# Create git worktree on the pl<N> branch
+PL_BRANCH="pl${N}"
+if git -C "$REPO_PATH" show-ref --verify --quiet "refs/heads/${PL_BRANCH}" 2>/dev/null; then
+    git -C "$REPO_PATH" worktree add "$WORKTREE_PATH" "$PL_BRANCH"
+elif git -C "$REPO_PATH" show-ref --verify --quiet "refs/remotes/origin/${PL_BRANCH}" 2>/dev/null; then
+    git -C "$REPO_PATH" worktree add "$WORKTREE_PATH" "$PL_BRANCH"
+else
+    git -C "$REPO_PATH" worktree add -b "$PL_BRANCH" "$WORKTREE_PATH" main
+fi
+
+# Symlink claude settings from the main worktree
+if [ -f "$REPO_PATH/.claude/settings.local.json" ] && [ ! -L "$WORKTREE_PATH/.claude/settings.local.json" ]; then
+    ln -sf "$REPO_PATH/.claude/settings.local.json" "$WORKTREE_PATH/.claude/settings.local.json"
+fi
+
+# Symlink scratch directory
+SCRATCH_DIR="$HOME/src/misc/jboulter/scratch"
+if [ -d "$SCRATCH_DIR" ] && [ ! -L "$WORKTREE_PATH/scratch" ]; then
+    ln -sf "$SCRATCH_DIR" "$WORKTREE_PATH/scratch"
+fi
+
+# Allow direnv in the new worktree
+if [ -f "$WORKTREE_PATH/.envrc" ]; then
+    direnv allow "$WORKTREE_PATH"
+fi
+
+# Get the focused workspace (the one cmux just created)
+WS=$(cmux identify --no-caller 2>/dev/null | grep '"workspace_ref"' | head -1 | sed 's/.*"\(workspace:[0-9]*\)".*/\1/')
+
+if [ -z "$WS" ]; then
+    echo "Error: could not determine cmux workspace" >&2
+    exit 1
+fi
+
+# Rename workspace
+cmux rename-workspace --workspace "$WS" "$WORKTREE_NAME"
+
+# Helper: extract all surface refs from tree output
+get_surfaces() {
+    cmux tree --workspace "$WS" | grep -o 'surface:[0-9]*'
+}
+
+# Get initial surface (the only one in the new workspace)
+INITIAL_SURFACE=$(get_surfaces | head -1)
+
+# Navigate initial terminal to worktree
+cmux send --workspace "$WS" --surface "$INITIAL_SURFACE" "cd $WORKTREE_PATH"
+cmux send-key --workspace "$WS" --surface "$INITIAL_SURFACE" Enter
+sleep 0.5
+
+# Split left for Claude
+KNOWN_SURFACES="$INITIAL_SURFACE"
+cmux new-split left --workspace "$WS" --surface "$INITIAL_SURFACE"
+sleep 0.3
+CLAUDE_SURFACE=$(get_surfaces | grep -v -F "$KNOWN_SURFACES" | head -1)
+
+# Launch claude in the left pane
+cmux send --workspace "$WS" --surface "$CLAUDE_SURFACE" "cd $WORKTREE_PATH && claude"
+cmux send-key --workspace "$WS" --surface "$CLAUDE_SURFACE" Enter
+
+# Split down from initial surface for lazygit
+KNOWN_SURFACES="${INITIAL_SURFACE}
+${CLAUDE_SURFACE}"
+cmux new-split down --workspace "$WS" --surface "$INITIAL_SURFACE"
+sleep 0.3
+LG_SURFACE=$(get_surfaces | grep -v -F "$KNOWN_SURFACES" | head -1)
+
+# Launch lazygit in the bottom-right pane
+cmux send --workspace "$WS" --surface "$LG_SURFACE" "cd $WORKTREE_PATH && lazygit"
+cmux send-key --workspace "$WS" --surface "$LG_SURFACE" Enter
+
+# Focus the terminal pane
+TERMINAL_PANE=$(cmux tree --workspace "$WS" | grep -B1 "$INITIAL_SURFACE" | grep -o 'pane:[0-9]*' | head -1)
+if [ -n "$TERMINAL_PANE" ]; then
+    cmux focus-pane --workspace "$WS" --pane "$TERMINAL_PANE"
+fi
+
+# Run setup commands in the terminal pane
+if [ -n "$SETUP_CMDS" ]; then
+    cmux send --workspace "$WS" --surface "$INITIAL_SURFACE" "$SETUP_CMDS"
+    cmux send-key --workspace "$WS" --surface "$INITIAL_SURFACE" Enter
+fi
