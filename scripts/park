@@ -59,7 +59,14 @@ if $clean && [[ -n "$current_branch" && "$current_branch" != "$pl_branch" ]]; th
 fi
 
 # Rename cmux workspace to indicate parked state
-ws=$(cmux identify --no-caller 2>/dev/null | grep '"workspace_ref"' | head -1 | sed 's/.*"\(workspace:[0-9]*\)".*/\1/' || true)
+# CMUX_PARK_WS can be set externally (e.g. by refresh-workspaces) to specify the workspace ref,
+# since cmux identify may return the focused workspace rather than the caller's after exec zsh.
+ws="${CMUX_PARK_WS:-}"
+if [[ -z "$ws" ]]; then
+    identify=$(cmux identify 2>/dev/null || true)
+    ws=$(echo "$identify" | grep -A5 '"caller"' | grep '"workspace_ref"' | head -1 | sed 's/.*"\(workspace:[0-9]*\)".*/\1/' || true)
+    [[ -z "$ws" ]] && ws=$(echo "$identify" | grep '"workspace_ref"' | head -1 | sed 's/.*"\(workspace:[0-9]*\)".*/\1/' || true)
+fi
 if [[ -n "$ws" ]]; then
     if cmux rename-workspace --workspace "$ws" "Parked: ${worktree_dir}" &>/dev/null; then
         echo "🏷️  Renamed workspace → ${C}Parked: ${worktree_dir}${N}"

@@ -1,30 +1,48 @@
 #!/bin/bash
 set -euo pipefail
 
-C=$'\033[0;36m' N=$'\033[0m'
+C=$'\033[0;36m' R=$'\033[0;31m' N=$'\033[0m'
+
+run_cmux() {
+    local output
+    if ! output=$(cmux "$@" 2>&1); then
+        echo "  ${R}❌ cmux $1 failed: ${output}${N}" >&2
+        return 1
+    fi
+}
 
 find_surface() {
     local ws_ref="$1" match_type="$2"
     local tree surface title
     tree=$(cmux tree --workspace "$ws_ref" 2>/dev/null)
 
+    local candidates=()
     while IFS= read -r sline; do
         surface=$(echo "$sline" | grep -o 'surface:[0-9]*')
         [[ -z "$surface" ]] && continue
         title=$(echo "$sline" | sed 's/.*\] "//' | sed 's/" .*//')
 
-        case "$match_type" in
-            claude)
-                if [[ "$title" == *"Claude Code"* ]] || [[ "$title" == ✳* ]]; then
-                    echo "$surface"; return
-                fi ;;
-            terminal)
-                if [[ "$title" != *"Claude Code"* ]] && [[ "$title" != ✳* ]] && \
-                   [[ "$title" != *lazygit* ]] && [[ "$title" != "lg" ]]; then
-                    echo "$surface"; return
-                fi ;;
-        esac
+        # Lazygit is easy to identify
+        if [[ "$title" == *lazygit* ]] || [[ "$title" == "lg" ]]; then
+            continue
+        fi
+        candidates+=("$surface")
     done <<< "$(echo "$tree" | grep 'surface:')"
+
+    # Among non-lazygit surfaces, check screen for claude's status bar (📂)
+    for surface in "${candidates[@]}"; do
+        local screen
+        screen=$(cmux read-screen --workspace "$ws_ref" --surface "$surface" --lines 3 2>/dev/null || true)
+        local is_claude=false
+        if echo "$screen" | grep -q '📂'; then
+            is_claude=true
+        fi
+
+        case "$match_type" in
+            claude) if $is_claude; then echo "$surface"; return; fi ;;
+            terminal) if ! $is_claude; then echo "$surface"; return; fi ;;
+        esac
+    done
 }
 
 reshell() {
@@ -33,8 +51,8 @@ reshell() {
     surface=$(find_surface "$ws_ref" terminal)
     [[ -z "$surface" ]] && return
 
-    cmux send --workspace "$ws_ref" --surface "$surface" "exec zsh"
-    cmux send-key --workspace "$ws_ref" --surface "$surface" Enter
+    run_cmux send --workspace "$ws_ref" --surface "$surface" "exec zsh" || return
+    run_cmux send-key --workspace "$ws_ref" --surface "$surface" Enter || return
     echo "  🔄 Re-shelled terminal"
 }
 
@@ -45,8 +63,8 @@ repark() {
     surface=$(find_surface "$ws_ref" terminal)
     [[ -z "$surface" ]] && return
 
-    cmux send --workspace "$ws_ref" --surface "$surface" 'git symbolic-ref --short HEAD 2>/dev/null | grep -q "^pl" && park'
-    cmux send-key --workspace "$ws_ref" --surface "$surface" Enter
+    run_cmux send --workspace "$ws_ref" --surface "$surface" "git symbolic-ref --short HEAD 2>/dev/null | grep -qE '^pl([0-9]+$|-|$)' && CMUX_PARK_WS=$ws_ref park; clear" || return
+    run_cmux send-key --workspace "$ws_ref" --surface "$surface" Enter || return
     echo "  🅿️  Re-parked (if on pl branch)"
 }
 
@@ -59,15 +77,32 @@ restart_claude() {
 
     local status
     status=$(cmux list-status --workspace "$ws_ref" 2>/dev/null)
-    if echo "$status" | grep -q 'claude_code=Idle'; then
-        cmux send --workspace "$ws_ref" --surface "$surface" "/exit"
-        cmux send-key --workspace "$ws_ref" --surface "$surface" Enter
-        sleep 1
-        cmux send --workspace "$ws_ref" --surface "$surface" "claude --continue"
-        cmux send-key --workspace "$ws_ref" --surface "$surface" Enter
-        echo "  🤖 Restarted claude with --continue"
-    elif echo "$status" | grep -q 'claude_code=Running'; then
+    if echo "$status" | grep -q 'claude_code=Running'; then
         echo "  ⏭️  Claude busy, skipping"
+        return
+    fi
+
+    # Check if claude is idle via status or screen (list-status isn't always populated)
+    local idle=false
+    if echo "$status" | grep -q 'claude_code='; then
+        idle=true
+    else
+        local screen
+        screen=$(cmux read-screen --workspace "$ws_ref" --surface "$surface" --lines 3 2>/dev/null)
+        if echo "$screen" | grep -q '^❯'; then
+            idle=true
+        fi
+    fi
+
+    if $idle; then
+        run_cmux send --workspace "$ws_ref" --surface "$surface" "/exit" || return
+        run_cmux send-key --workspace "$ws_ref" --surface "$surface" Enter || return
+        sleep 1
+        run_cmux send --workspace "$ws_ref" --surface "$surface" "claude --continue" || return
+        run_cmux send-key --workspace "$ws_ref" --surface "$surface" Enter || return
+        echo "  🤖 Restarted claude with --continue"
+    else
+        echo "  💤 Claude not detected"
     fi
 }
 
