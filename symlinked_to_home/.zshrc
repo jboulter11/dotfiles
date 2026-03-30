@@ -31,58 +31,14 @@ alias rmdd='rm -rf $HOME/Library/Developer/Xcode/DerivedData'
 
 alias lg='lazygit'
 alias nv='neovide --fork'
-source ~/.dropboxrc
-source ~/.worktreesrc
+alias pl='park'
+alias plc='park --clean'
 
-#Functions
+export PATH="$(dirname "$(dirname "$(readlink "$HOME/.zshrc")")")/scripts:$PATH"
+source ~/.dropboxrc
+
 function cd {
     builtin cd "$@" && ls -F
-}
-
-function simVideo() {
-    xcrun simctl io booted recordVideo "$@"
-}
-
-function killCoreAudio() {
-    sudo pkill -9 coreaudiod
-}
-
-# Chrome
-function chrome() {
-    open -na "Google Chrome" --args $@
-}
-
-function incognito() {
-    open -na "Google Chrome" --args --incognito $@
-}
-
-function replace() {
-  local pattern="$1"
-  local replacement="$2"
-  local escaped_pattern
-  local escaped_replacement
-  escaped_pattern=$(escape_for_sed "$pattern")
-  escaped_replacement=$(escape_for_sed "$replacement")
-
-  local files
-  files=$(rg "$escaped_pattern" --files-with-matches)
-
-  if [[ -z "$files" ]]; then
-    echo "No files matched."
-    return 1
-  fi
-
-  if [[ "$3" != "-s" ]]; then
-    echo "$files"
-  fi
-
-  echo "$files" | xargs sed -i "" "s/$escaped_pattern/$escaped_replacement/g"
-
-  find . -type f -name "*.bak" -delete
-}
-
-function escape_for_sed() {
-  echo "$1" | sed 's/[\^\/]/\\&/g'
 }
 
 [ -f ~/.fzf.zsh ] && source ~/.fzf.zsh

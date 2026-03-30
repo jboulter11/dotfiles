@@ -1,0 +1,83 @@
+#!/bin/bash
+set -euo pipefail
+
+C=$'\033[0;36m' N=$'\033[0m'
+
+find_surface() {
+    local ws_ref="$1" match_type="$2"
+    local tree surface title
+    tree=$(cmux tree --workspace "$ws_ref" 2>/dev/null)
+
+    while IFS= read -r sline; do
+        surface=$(echo "$sline" | grep -o 'surface:[0-9]*')
+        [[ -z "$surface" ]] && continue
+        title=$(echo "$sline" | sed 's/.*\] "//' | sed 's/" .*//')
+
+        case "$match_type" in
+            claude)
+                if [[ "$title" == *"Claude Code"* ]] || [[ "$title" == ✳* ]]; then
+                    echo "$surface"; return
+                fi ;;
+            terminal)
+                if [[ "$title" != *"Claude Code"* ]] && [[ "$title" != ✳* ]] && \
+                   [[ "$title" != *lazygit* ]] && [[ "$title" != "lg" ]]; then
+                    echo "$surface"; return
+                fi ;;
+        esac
+    done <<< "$(echo "$tree" | grep 'surface:')"
+}
+
+reshell() {
+    local ws_ref="$1"
+    local surface
+    surface=$(find_surface "$ws_ref" terminal)
+    [[ -z "$surface" ]] && return
+
+    cmux send --workspace "$ws_ref" --surface "$surface" "exec zsh"
+    cmux send-key --workspace "$ws_ref" --surface "$surface" Enter
+    echo "  🔄 Re-shelled terminal"
+}
+
+repark() {
+    local ws_ref="$1"
+
+    local surface
+    surface=$(find_surface "$ws_ref" terminal)
+    [[ -z "$surface" ]] && return
+
+    cmux send --workspace "$ws_ref" --surface "$surface" 'git symbolic-ref --short HEAD 2>/dev/null | grep -q "^pl" && park'
+    cmux send-key --workspace "$ws_ref" --surface "$surface" Enter
+    echo "  🅿️  Re-parked (if on pl branch)"
+}
+
+restart_claude() {
+    local ws_ref="$1"
+
+    local surface
+    surface=$(find_surface "$ws_ref" claude)
+    [[ -z "$surface" ]] && return
+
+    local status
+    status=$(cmux list-status --workspace "$ws_ref" 2>/dev/null)
+    if echo "$status" | grep -q 'claude_code=Idle'; then
+        cmux send --workspace "$ws_ref" --surface "$surface" "/exit"
+        cmux send-key --workspace "$ws_ref" --surface "$surface" Enter
+        sleep 1
+        cmux send --workspace "$ws_ref" --surface "$surface" "claude --continue"
+        cmux send-key --workspace "$ws_ref" --surface "$surface" Enter
+        echo "  🤖 Restarted claude with --continue"
+    elif echo "$status" | grep -q 'claude_code=Running'; then
+        echo "  ⏭️  Claude busy, skipping"
+    fi
+}
+
+while IFS= read -r line; do
+    ws_ref=$(echo "$line" | grep -o 'workspace:[0-9]*')
+    ws_name=$(echo "$line" | sed 's/.*workspace:[0-9]* *//' | sed 's/ *\[selected\].*//')
+    [[ -z "$ws_ref" ]] && continue
+
+    echo "${C}${ws_name}${N} (${ws_ref})"
+    reshell "$ws_ref"
+    repark "$ws_ref"
+    restart_claude "$ws_ref"
+done <<< "$(cmux list-workspaces 2>/dev/null | grep 'workspace:')"

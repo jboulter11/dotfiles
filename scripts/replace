@@ -1,0 +1,26 @@
+#!/bin/bash
+set -euo pipefail
+
+escape_for_sed() {
+  echo "$1" | sed 's/[\^\/]/\\&/g'
+}
+
+pattern="$1"
+replacement="$2"
+escaped_pattern=$(escape_for_sed "$pattern")
+escaped_replacement=$(escape_for_sed "$replacement")
+
+files=$(rg "$escaped_pattern" --files-with-matches)
+
+if [[ -z "$files" ]]; then
+    echo "No files matched."
+    exit 1
+fi
+
+if [[ "${3:-}" != "-s" ]]; then
+    echo "$files"
+fi
+
+echo "$files" | xargs sed -i "" "s/$escaped_pattern/$escaped_replacement/g"
+
+find . -type f -name "*.bak" -delete
