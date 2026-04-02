@@ -77,7 +77,7 @@ restart_claude() {
     # Surface title confirmed this is Claude; if not Running, it's idle
     run_cmux send --workspace "$ws_ref" --surface "$surface" "/exit" || return
     run_cmux send-key --workspace "$ws_ref" --surface "$surface" Enter || return
-    sleep 1
+    sleep 3
     run_cmux send --workspace "$ws_ref" --surface "$surface" "claude --continue" || return
     run_cmux send-key --workspace "$ws_ref" --surface "$surface" Enter || return
     echo "  🤖 Restarted claude with --continue"
