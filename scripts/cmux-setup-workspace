@@ -68,6 +68,7 @@ get_surfaces() {
 INITIAL_SURFACE=$(get_surfaces | head -1)
 
 # Navigate initial terminal to worktree
+cmux rename-tab --workspace "$WS" --surface "$INITIAL_SURFACE" "terminal"
 cmux send --workspace "$WS" --surface "$INITIAL_SURFACE" "cd $WORKTREE_PATH"
 cmux send-key --workspace "$WS" --surface "$INITIAL_SURFACE" Enter
 sleep 0.5
@@ -79,6 +80,7 @@ sleep 0.3
 CLAUDE_SURFACE=$(get_surfaces | grep -v -F "$KNOWN_SURFACES" | head -1)
 
 # Launch claude in the left pane
+cmux rename-tab --workspace "$WS" --surface "$CLAUDE_SURFACE" "claude"
 cmux send --workspace "$WS" --surface "$CLAUDE_SURFACE" "cd $WORKTREE_PATH && claude"
 cmux send-key --workspace "$WS" --surface "$CLAUDE_SURFACE" Enter
 
@@ -90,6 +92,7 @@ sleep 0.3
 LG_SURFACE=$(get_surfaces | grep -v -F "$KNOWN_SURFACES" | head -1)
 
 # Launch lazygit in the bottom-right pane
+cmux rename-tab --workspace "$WS" --surface "$LG_SURFACE" "lg"
 cmux send --workspace "$WS" --surface "$LG_SURFACE" "cd $WORKTREE_PATH && lazygit"
 cmux send-key --workspace "$WS" --surface "$LG_SURFACE" Enter
 
