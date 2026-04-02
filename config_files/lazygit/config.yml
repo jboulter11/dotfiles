@@ -1,0 +1,9 @@
+git:
+  pagers:
+    - pager: delta --dark --paging=never
+customCommands:
+  - key: <c-p>
+    context: global
+    command: gh dbx pr
+    description: Create Dropbox PR
+    output: terminal

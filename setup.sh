@@ -56,6 +56,13 @@ link () {
             ln -sfnv "$filepath" "$HOME/.claude/$fname"
         done
 
+        mkdir -p "$HOME/Library/Application Support/lazygit/"
+        for filepath in "$SCRIPT_DIR"/config_files/lazygit/*; do
+            local fname
+            fname=$(basename "$filepath")
+            ln -sfnv "$filepath" "$HOME/Library/Application Support/lazygit/$fname"
+        done
+
         mkdir -p "$HOME/Library/Application Support/espanso/match/"
         for filepath in "$SCRIPT_DIR"/symlinked_to_espanso/*; do
             local name
