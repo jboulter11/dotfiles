@@ -1,9 +1,15 @@
 git:
   pagers:
-    - pager: delta --dark --paging=never
+    - colorArg: always
+      pager: delta --dark --paging=never
 customCommands:
   - key: <c-p>
     context: global
     command: gh dbx pr
     description: Create Dropbox PR
     output: terminal
+  - key: <c-t>
+    context: files
+    command: git difftool
+    description: Open changes in Kaleidoscope
+    output: log
