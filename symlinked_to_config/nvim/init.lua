@@ -340,6 +340,33 @@ require("lazy").setup({
       },
     },
   },
+  {
+    "3rd/image.nvim",
+    opts = {
+      max_height_window_percentage = 80,
+    },
+  },
+  {
+    "3rd/diagram.nvim",
+    dependencies = { "3rd/image.nvim" },
+    opts = {
+      renderer_options = {
+        mermaid = {
+          background = "transparent",
+          theme = "dark",
+          scale = 3,
+        },
+      },
+    },
+  },
+  {
+    "MeanderingProgrammer/render-markdown.nvim",
+    dependencies = {
+      "nvim-treesitter/nvim-treesitter",
+      { "nvim-mini/mini.icons", opts = {} },
+    },
+    opts = {},
+  },
 }, {})
 
 -- [[ Setting options ]]
@@ -432,7 +459,7 @@ pcall(require("telescope").load_extension, "fzf")
 -- See `:help nvim-treesitter`
 require("nvim-treesitter.configs").setup {
   -- Add languages to be installed here that you want installed for treesitter
-  ensure_installed = { "c", "cpp", "go", "lua", "python", "rust", "vimdoc", "vim", "swift", "objc", "ruby", "bash" },
+  ensure_installed = { "c", "cpp", "go", "lua", "python", "rust", "vimdoc", "vim", "swift", "objc", "ruby", "bash", "markdown", "markdown_inline" },
 
   -- Autoinstall languages that are not installed. Defaults to false (but you can change for yourself!)
   auto_install = true,

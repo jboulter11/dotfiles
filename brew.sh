@@ -20,6 +20,9 @@ brew update
 SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
 brew bundle --file="$SCRIPT_DIR/Brewfile"
 
+# install puppeteer chrome for mermaid-cli
+npx puppeteer browsers install chrome-headless-shell
+
 # xcode commandline tools
 sudo xcode-select --install
 
