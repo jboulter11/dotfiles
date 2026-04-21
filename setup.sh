@@ -18,16 +18,76 @@ setup_file_system () {
 
 # TODO : Delete symlinks to deleted files
 # TODO - add support for -f and --force
+force_symlink () {
+    local source="$1"
+    local target="$2"
+
+    if [ -d "$target" ] && [ ! -L "$target" ]; then
+        echo "Cannot replace directory with symlink: $target"
+        return 1
+    fi
+
+    if [ -e "$target" ] || [ -L "$target" ]; then
+        rm -f "$target"
+    fi
+
+    ln -sfnv "$source" "$target"
+}
+
+remove_stale_agent_link () {
+    local target="$1"
+    local source
+
+    if [ ! -L "$target" ]; then
+        return 0
+    fi
+
+    source=$(readlink "$target")
+    case "$source" in
+        "$SCRIPT_DIR/symlinked_to_home/AGENTS.md"|"AGENTS.md"|"../AGENTS.md"|"../../AGENTS.md")
+            rm -fv "$target"
+            ;;
+    esac
+}
+
+remove_stale_literal_glob_link () {
+    local target="$HOME/*"
+    local source
+
+    if [ ! -L "$target" ]; then
+        return 0
+    fi
+
+    source=$(readlink "$target")
+    if [ "$source" = "$SCRIPT_DIR/symlinked_to_home/*" ]; then
+        rm -fv "$target"
+    fi
+}
+
+link_agent_instructions () {
+    local agents_file="$SCRIPT_DIR/agent_instructions/AGENTS.md"
+    if [ -f "$agents_file" ]; then
+        mkdir -p "$HOME/.codex" "$HOME/.claude"
+        force_symlink "$agents_file" "$HOME/.codex/AGENTS.md"
+        force_symlink "$agents_file" "$HOME/.claude/CLAUDE.md"
+        remove_stale_agent_link "$HOME/AGENTS.md"
+        remove_stale_agent_link "$HOME/CLAUDE.md"
+        remove_stale_agent_link "$HOME/.config/claude/CLAUDE.md"
+    fi
+}
+
 link () {
     echo "${Cyan}Symlinking dotfiles...$Reset"
     echo "This will symlink the files in this repo to the home directory"
     if user_ack ; then
         for filepath in "$SCRIPT_DIR"/symlinked_to_home/.* "$SCRIPT_DIR"/symlinked_to_home/*; do
+            [[ -e "$filepath" || -L "$filepath" ]] || continue
             local name
             name=$(basename "$filepath")
             [[ "$name" == "." || "$name" == ".." ]] && continue
             ln -sfnv "$filepath" "$HOME/$name"
         done
+        remove_stale_literal_glob_link
 
         mkdir -p "$HOME/.config"
         for filepath in "$SCRIPT_DIR"/symlinked_to_config/*; do
@@ -55,6 +115,8 @@ link () {
             fname=$(basename "$filepath")
             ln -sfnv "$filepath" "$HOME/.claude/$fname"
         done
+
+        link_agent_instructions
 
         mkdir -p "$HOME/Library/Application Support/lazygit/"
         for filepath in "$SCRIPT_DIR"/config_files/lazygit/*; do
