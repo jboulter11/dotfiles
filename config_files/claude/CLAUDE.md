@@ -1,6 +1,6 @@
 - Don't make changes to module_weight in bazel files, they are set automatically.
 - Never amend commits. Always create new commits for additional changes.
-- Never commit to a `pl` branch (e.g., `pl`, `pl2`, `pl-example-text`). Always branch off before committing.
+- Never commit to a `pl` branch (e.g., `pl`, `pl2`, `pl-example-text`). Always branch off of latest main/master (primary branch) before committing.
 - Flat branch names only. No prefixes like `jboulter/`. Use `example-branch`, not `jboulter/example-branch`.
 - Always run `gh` commands outside the sandbox (`dangerouslyDisableSandbox: true`).
 - Always prefer separate tool calls over chaining commands with `&&`, `;`, or `echo "---"`. Run each command as its own Bash call.

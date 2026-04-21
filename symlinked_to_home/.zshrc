@@ -25,7 +25,7 @@ alias ga.='git add .'
 alias garc='git add .; git rebase --continue'
 alias gco='git checkout'
 alias gmt='git mergetool'
-alias gdt='git difftool'
+gdt() { local range="${1:-main...HEAD}"; git difftool --no-prompt "$range" -- $(git diff --name-only "$range"); }
 
 alias rmdd='rm -rf $HOME/Library/Developer/Xcode/DerivedData'
 
