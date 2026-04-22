@@ -1,6 +1,7 @@
 #!/bin/bash
 
 SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
+SYMLINK_MAP_FILE="$SCRIPT_DIR/symlink_map.conf"
 
 source "$SCRIPT_DIR/utilities.sh"
 
@@ -34,6 +35,96 @@ force_symlink () {
     ln -sfnv "$source" "$target"
 }
 
+resolve_symlink_destination () {
+    local destination="$1"
+
+    case "$destination" in
+        home)
+            echo "$HOME"
+            ;;
+        home/*)
+            echo "$HOME/${destination#home/}"
+            ;;
+        "~")
+            echo "$HOME"
+            ;;
+        "~/"*)
+            echo "$HOME/${destination#\~/}"
+            ;;
+        /*)
+            echo "$destination"
+            ;;
+        *)
+            echo "$SCRIPT_DIR/$destination"
+            ;;
+    esac
+}
+
+resolve_symlink_source_glob () {
+    local source_glob="$1"
+
+    case "$source_glob" in
+        /*)
+            echo "$source_glob"
+            ;;
+        *)
+            echo "$SCRIPT_DIR/$source_glob"
+            ;;
+    esac
+}
+
+link_symlink_map () {
+    local destination source_glob target_name destination_dir source_pattern
+
+    if [ ! -f "$SYMLINK_MAP_FILE" ]; then
+        echo "Missing symlink map: $SYMLINK_MAP_FILE"
+        return 1
+    fi
+
+    while IFS='|' read -r destination source_glob target_name || [ -n "$destination$source_glob$target_name" ]; do
+        [[ -z "${destination//[[:space:]]/}" ]] && continue
+        [[ "$destination" == \#* ]] && continue
+
+        if [ -z "$source_glob" ]; then
+            echo "Invalid symlink map row: $destination"
+            return 1
+        fi
+
+        destination_dir=$(resolve_symlink_destination "$destination")
+        source_pattern=$(resolve_symlink_source_glob "$source_glob")
+        mkdir -p "$destination_dir"
+
+        local matches=()
+        local nullglob_state dotglob_state
+        nullglob_state=$(shopt -p nullglob)
+        dotglob_state=$(shopt -p dotglob)
+        shopt -s nullglob dotglob
+        matches=( $source_pattern )
+        eval "$nullglob_state"
+        eval "$dotglob_state"
+
+        if [ "${#matches[@]}" -eq 0 ]; then
+            echo "No files matched symlink source: $source_glob"
+            continue
+        fi
+
+        if [ -n "$target_name" ] && [ "${#matches[@]}" -ne 1 ]; then
+            echo "Target name requires exactly one source match: $source_glob"
+            return 1
+        fi
+
+        local filepath name
+        for filepath in "${matches[@]}"; do
+            if [ -n "$target_name" ]; then
+                name="$target_name"
+            else
+                name=$(basename "$filepath")
+            fi
+            force_symlink "$filepath" "$destination_dir/$name" || return 1
+        done
+    done < "$SYMLINK_MAP_FILE"
+}
+
 remove_stale_agent_link () {
     local target="$1"
     local source
@@ -64,73 +155,19 @@ remove_stale_literal_glob_link () {
     fi
 }
 
-link_agent_instructions () {
-    local agents_file="$SCRIPT_DIR/agent_instructions/AGENTS.md"
-    if [ -f "$agents_file" ]; then
-        mkdir -p "$HOME/.codex" "$HOME/.claude"
-        force_symlink "$agents_file" "$HOME/.codex/AGENTS.md"
-        force_symlink "$agents_file" "$HOME/.claude/CLAUDE.md"
-        remove_stale_agent_link "$HOME/AGENTS.md"
-        remove_stale_agent_link "$HOME/CLAUDE.md"
-        remove_stale_agent_link "$HOME/.config/claude/CLAUDE.md"
-    fi
+cleanup_stale_symlinks () {
+    remove_stale_literal_glob_link
+    remove_stale_agent_link "$HOME/AGENTS.md"
+    remove_stale_agent_link "$HOME/CLAUDE.md"
+    remove_stale_agent_link "$HOME/.config/claude/CLAUDE.md"
 }
 
 link () {
     echo "${Cyan}Symlinking dotfiles...$Reset"
     echo "This will symlink the files in this repo to the home directory"
     if user_ack ; then
-        for filepath in "$SCRIPT_DIR"/symlinked_to_home/.* "$SCRIPT_DIR"/symlinked_to_home/*; do
-            [[ -e "$filepath" || -L "$filepath" ]] || continue
-            local name
-            name=$(basename "$filepath")
-            [[ "$name" == "." || "$name" == ".." ]] && continue
-            ln -sfnv "$filepath" "$HOME/$name"
-        done
-        remove_stale_literal_glob_link
-
-        mkdir -p "$HOME/.config"
-        for filepath in "$SCRIPT_DIR"/symlinked_to_config/*; do
-            local name
-            name=$(basename "$filepath")
-            ln -sfnv "$filepath" "$HOME/.config/$name"
-        done
-
-        # Per-file config symlinks (for config dirs with runtime files we don't track)
-        for dir in "$SCRIPT_DIR"/config_files/*; do
-            local name
-            name=$(basename "$dir")
-            mkdir -p "$HOME/.config/$name"
-            for filepath in "$dir"/*; do
-                local fname
-                fname=$(basename "$filepath")
-                ln -sfnv "$filepath" "$HOME/.config/$name/$fname"
-            done
-        done
-
-        # Claude Code config (per-file into ~/.claude/)
-        mkdir -p "$HOME/.claude"
-        for filepath in "$SCRIPT_DIR"/config_files/claude/*; do
-            local fname
-            fname=$(basename "$filepath")
-            ln -sfnv "$filepath" "$HOME/.claude/$fname"
-        done
-
-        link_agent_instructions
-
-        mkdir -p "$HOME/Library/Application Support/lazygit/"
-        for filepath in "$SCRIPT_DIR"/config_files/lazygit/*; do
-            local fname
-            fname=$(basename "$filepath")
-            ln -sfnv "$filepath" "$HOME/Library/Application Support/lazygit/$fname"
-        done
-
-        mkdir -p "$HOME/Library/Application Support/espanso/match/"
-        for filepath in "$SCRIPT_DIR"/symlinked_to_espanso/*; do
-            local name
-            name=$(basename "$filepath")
-            ln -sfnv "$filepath" "$HOME/Library/Application Support/espanso/match/$name"
-        done
+        link_symlink_map || return 1
+        cleanup_stale_symlinks
 
         echo "Symlinking complete"
     else
