@@ -169,11 +169,35 @@ cleanup_stale_symlinks () {
     remove_stale_agent_link "$HOME/.config/claude/CLAUDE.md"
 }
 
+link_lazygit_runtime_config () {
+    local config_source="$SCRIPT_DIR/config_files/lazygit/config.yml"
+    local config_dir
+    local config_target
+
+    if [ ! -f "$config_source" ] || ! command -v lazygit &> /dev/null; then
+        return 0
+    fi
+
+    config_dir=$(lazygit --print-config-dir 2>/dev/null) || return 0
+    if [ -z "$config_dir" ]; then
+        return 0
+    fi
+
+    mkdir -p "$config_dir"
+    config_target="$config_dir/config.yml"
+    if [ -L "$config_target" ] && [ "$(readlink "$config_target")" = "$config_source" ]; then
+        return 0
+    fi
+
+    force_symlink "$config_source" "$config_target"
+}
+
 link () {
     echo "${Cyan}Symlinking dotfiles...$Reset"
     echo "This will symlink the files in this repo to the home directory"
     if user_ack ; then
         link_symlink_map || return 1
+        link_lazygit_runtime_config || return 1
         cleanup_stale_symlinks
 
         echo "Symlinking complete"
