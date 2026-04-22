@@ -1,7 +1,7 @@
 #!/bin/bash
 
 SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
-SYMLINK_MAP_FILE="$SCRIPT_DIR/symlink_map.conf"
+SYMLINK_MAP_FILE="$SCRIPT_DIR/symlink_map.json"
 
 source "$SCRIPT_DIR/utilities.sh"
 
@@ -75,15 +75,22 @@ resolve_symlink_source_glob () {
 
 link_symlink_map () {
     local destination source_glob target_name destination_dir source_pattern
+    local map_rows
 
     if [ ! -f "$SYMLINK_MAP_FILE" ]; then
         echo "Missing symlink map: $SYMLINK_MAP_FILE"
         return 1
     fi
 
-    while IFS='|' read -r destination source_glob target_name || [ -n "$destination$source_glob$target_name" ]; do
+    if ! command -v jq &> /dev/null; then
+        echo "jq is required to parse $SYMLINK_MAP_FILE"
+        return 1
+    fi
+
+    map_rows=$(jq -r '.links[] | [.dest, .sources, (.name // "")] | @tsv' "$SYMLINK_MAP_FILE") || return 1
+
+    while IFS=$'\t' read -r destination source_glob target_name || [ -n "$destination$source_glob$target_name" ]; do
         [[ -z "${destination//[[:space:]]/}" ]] && continue
-        [[ "$destination" == \#* ]] && continue
 
         if [ -z "$source_glob" ]; then
             echo "Invalid symlink map row: $destination"
@@ -122,7 +129,7 @@ link_symlink_map () {
             fi
             force_symlink "$filepath" "$destination_dir/$name" || return 1
         done
-    done < "$SYMLINK_MAP_FILE"
+    done <<< "$map_rows"
 }
 
 remove_stale_agent_link () {

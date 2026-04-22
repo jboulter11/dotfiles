@@ -1,0 +1,49 @@
+{
+  "links": [
+    {
+      "dest": "home",
+      "sources": "symlinked_to_home/*"
+    },
+    {
+      "dest": "~/.config",
+      "sources": "symlinked_to_config/*"
+    },
+    {
+      "dest": "~/.config/claude",
+      "sources": "config_files/claude/*"
+    },
+    {
+      "dest": "~/.config/gh",
+      "sources": "config_files/gh/*"
+    },
+    {
+      "dest": "~/.config/karabiner",
+      "sources": "config_files/karabiner/*"
+    },
+    {
+      "dest": "~/.config/lazygit",
+      "sources": "config_files/lazygit/*"
+    },
+    {
+      "dest": "~/.claude",
+      "sources": "config_files/claude/*"
+    },
+    {
+      "dest": "~/.codex",
+      "sources": "agent_instructions/AGENTS.md"
+    },
+    {
+      "dest": "~/.claude",
+      "sources": "agent_instructions/AGENTS.md",
+      "name": "CLAUDE.md"
+    },
+    {
+      "dest": "~/Library/Application Support/lazygit",
+      "sources": "config_files/lazygit/*"
+    },
+    {
+      "dest": "~/Library/Application Support/espanso/match",
+      "sources": "symlinked_to_espanso/*"
+    }
+  ]
+}
