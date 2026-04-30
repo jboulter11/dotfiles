@@ -1,3 +1,4 @@
+tap "jboulter11/tap"
 tap "withered-magic/brew"
 tap "xcodesorg/made"
 
@@ -16,6 +17,7 @@ brew "git-town"
 brew "go"
 brew "graphviz"
 brew "imagemagick"
+brew "jboulter11/tap/zapp"
 brew "jq"
 brew "just"
 brew "lazygit"
