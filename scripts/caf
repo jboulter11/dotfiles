@@ -1,0 +1,43 @@
+#!/bin/zsh
+
+if [[ $# -gt 1 ]]; then
+  echo "usage: ${0:t} [duration]" >&2
+  exit 2
+fi
+
+duration="${1:-4h}"
+unit="${duration[-1]}"
+amount="$duration"
+
+case "$unit" in
+  h|m|s)
+    amount="${duration[1,-2]}"
+    ;;
+  [0-9])
+    unit=s
+    ;;
+  *)
+    echo "usage: ${0:t} [duration]" >&2
+    echo "duration examples: 4h, 60m, 14400" >&2
+    exit 2
+    ;;
+esac
+
+integer_re='^[0-9]+$'
+if [[ -z "$amount" || ! "$amount" =~ $integer_re ]]; then
+  echo "usage: ${0:t} [duration]" >&2
+  echo "duration examples: 4h, 60m, 14400" >&2
+  exit 2
+fi
+
+integer amount_int seconds
+amount_int=$(( 10#$amount ))
+case "$unit" in
+  h) seconds=$(( amount_int * 3600 )) ;;
+  m) seconds=$(( amount_int * 60 )) ;;
+  s) seconds=$amount_int ;;
+esac
+
+sleep_time=$(date -v+${seconds}S +%l:%M%p | tr -d ' ')
+echo "Staying awake for ${duration}, will sleep at ${sleep_time}"
+caffeinate -dimsu -t "$seconds"

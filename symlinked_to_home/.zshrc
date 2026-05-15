@@ -43,23 +43,8 @@ function cd {
 
 [ -f ~/.fzf.zsh ] && source ~/.fzf.zsh
 
-# From repo_setup:
-export ANDROID_HOME="$HOME/Library/Android/sdk"
-export ANDROID_NDK_HOME="$HOME/Library/Android/ndk"
-export ANDROID_NDK="$HOME/Library/Android/ndk"
-export PATH="$ANDROID_HOME/platform-tools:$ANDROID_HOME/tools:$ANDROID_NDK:$PATH"
-
 # rbenv
 eval "$(rbenv init - zsh)"
-
-# intel
-export PATH="/usr/local/opt/php@7.4/bin:$PATH"
-export PATH="/usr/local/opt/php@7.4/sbin:$PATH"
-export PATH="/usr/local/homebrew/sbin:$PATH"
-
-# m1
-export PATH="/opt/homebrew/opt/php@7.4/bin:$PATH"
-export PATH="/opt/homebrew/opt/php@7.4/sbin:$PATH"
 
 eval "$(/opt/homebrew/bin/brew shellenv)"
 # load tooldir completions
@@ -67,23 +52,10 @@ fpath+=(~/.zsh/completion)
 autoload -U compinit
 compinit -u
 _comp_options+=(globdots)
-eval "$(pyenv init -)"
-export PATH="$HOME/.local/share/sentry-devenv/bin:$PATH"
-
 
 eval "$(direnv hook zsh)"
 
-export BAZEL=1
-# From repo_setup:
-export JAVA_HOME="$HOME/.dbx_jdk/zulu21.32.17-ca-fx-jdk21.0.2-macosx_aarch64"
-# From repo_setup:
-export PATH="$HOME/.pyenv/shims:$PATH"
 export PATH="$HOME/.local/bin:$PATH"
-
-# sentry
-export PATH="$HOME/.sentry/bin:$PATH"
-# opencode
-export PATH="$HOME/.opencode/bin:$PATH"
 
 # bun completions
 [ -s "/Users/jim/.bun/_bun" ] && source "/Users/jim/.bun/_bun"

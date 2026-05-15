@@ -13,22 +13,6 @@ alias ghdm='gh dbx merge --keep-branch'
 alias land='gh dbx land --keep-branch'
 
 alias gen='./ios_gen_module_project -o'
-alias td='./td'
-
-function b() {
-    BUCK_PATH="$(buck root)"
-    MY_PATH="$(pwd)"
-    TARGET_PATH="/${MY_PATH#$BUCK_PATH}"
-    BUILD_PATH=$TARGET_PATH$1
-    echo "$BUILD_PATH"
-    buckw build "$BUILD_PATH"
-}
-
-function vv() {
-    buckw query "attrfilter('module_name', '$1', '//...')" | tail -1
-}
-
-PATH=$PATH:~/src/GitChildBranchHelpers/bin/
 
 ssh-add --apple-use-keychain ~/.ssh/id_ed25519_dbx_github > /dev/null 2>&1
 
