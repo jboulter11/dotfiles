@@ -50,7 +50,55 @@ M.setup = function()
 
   -- Git via telescope
   nmap("<leader>gst", require("telescope.builtin").git_status, { desc = "[G]it [S][T]atus" })
-  nmap("<leader>gbc", require("telescope.builtin").git_bcommits, { desc = "[G]it [B]uffer [C]ommits" })
+  nmap("<leader>gbc", function()
+    local entry_display = require("telescope.pickers.entry_display")
+    local make_entry = require("telescope.make_entry")
+    vim.api.nvim_set_hl(0, "TelescopeBcommitsDate", { fg = "#fd971f", default = true })
+    local displayer = entry_display.create({
+      separator = " ",
+      items = {
+        { width = 8 },
+        { width = 16 },
+        { remaining = true },
+      },
+    })
+    local opts = {
+      git_command = {
+        "git",
+        "log",
+        "--pretty=tformat:%h %ad %s",
+        "--date=format:%Y-%m-%d %I%p",
+        "--abbrev-commit",
+        "--follow",
+      },
+    }
+    opts.entry_maker = function(line)
+      if line == nil or line == "" then
+        return nil
+      end
+      local sha, date_part, time_part, msg = line:match("^(%S+)%s+(%S+)%s+(%S+)%s+(.*)$")
+      if not sha then
+        return nil
+      end
+      local date = date_part .. " " .. time_part
+      local make_display = function(entry)
+        return displayer({
+          { entry.value, "TelescopeResultsIdentifier" },
+          { entry.date, "TelescopeBcommitsDate" },
+          entry.msg or "",
+        })
+      end
+      return make_entry.set_default_entry_mt({
+        value = sha,
+        ordinal = sha .. " " .. msg,
+        msg = msg,
+        date = date,
+        display = make_display,
+        current_file = opts.current_file,
+      }, opts)
+    end
+    require("telescope.builtin").git_bcommits(opts)
+  end, { desc = "[G]it [B]uffer [C]ommits" })
 
   -- [[ Sessions (persisted.nvim) ]]
 
@@ -180,6 +228,8 @@ M.setGitSignsMaps = function(bufnr)
   nmap("<leader>gn", require("gitsigns").next_hunk, { buffer = bufnr, desc = "[G]o to [N]ext Hunk" })
   -- Preview the hunk under the cursor
   nmap("<leader>ph", require("gitsigns").preview_hunk, { buffer = bufnr, desc = "[P]review [H]unk" })
+  -- Blame the line under the cursor
+  nmap("<leader>gbl", require("gitsigns").blame_line, { buffer = bufnr, desc = "[G]it [B]lame [L]ine" })
 end
 
 return M
