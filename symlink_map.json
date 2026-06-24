@@ -44,6 +44,10 @@
     {
       "dest": "~/Library/Application Support/espanso/match",
       "sources": "symlinked_to_espanso/*"
+    },
+    {
+      "dest": "~/.claude/skills",
+      "sources": "skills/*"
     }
   ]
 }

@@ -58,3 +58,6 @@
 
 [delta]
 	navigate = true
+[trace2]
+	eventTarget = af_unix:stream:/Users/jboulter/.git-ai/internal/daemon/trace2.sock
+	eventNesting = 10

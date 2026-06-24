@@ -25,7 +25,15 @@ alias ga.='git add .'
 alias garc='git add .; git rebase --continue'
 alias gco='git checkout'
 alias gmt='git mergetool'
-gdt() { local range="${1:-main...HEAD}"; git difftool --no-prompt "$range" -- $(git diff --name-only "$range"); }
+gdt() {
+  git add --intent-to-add -A
+  git difftool "$@"
+}
+
+gdtm() {
+  git add --intent-to-add -A
+  git difftool $(git merge-base main HEAD)
+}
 
 alias rmdd='rm -rf $HOME/Library/Developer/Xcode/DerivedData'
 
@@ -63,3 +71,6 @@ export PATH="$HOME/.local/bin:$PATH"
 # bun
 export BUN_INSTALL="$HOME/.bun"
 export PATH="$BUN_INSTALL/bin:$PATH"
+
+# Added by git-ai installer on Thu Jun 18 12:42:23 PDT 2026
+export PATH="/Users/jboulter/.git-ai/bin:$PATH"

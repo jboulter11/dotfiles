@@ -12,7 +12,7 @@ alias gprd='gh dbx pr --draft'
 alias ghdm='gh dbx merge --keep-branch'
 alias land='gh dbx land --keep-branch'
 
-alias gen='./ios_gen_module_project -o'
+export BAZEL_APPLE_PREFER_PERSISTENT_SIMS=1
 
 ssh-add --apple-use-keychain ~/.ssh/id_ed25519_dbx_github > /dev/null 2>&1
 
