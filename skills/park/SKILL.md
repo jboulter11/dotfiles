@@ -25,7 +25,7 @@ Clean up the current session's work. Run the `park` script with `-c` to park and
 
 ## No PRs or Tickets
 
-If no Jira tickets or PRs were mentioned in the conversation, skip the gate check and Jira steps entirely. Just run `park -c` and delete extra branches.
+If no Jira tickets or PRs were mentioned in the conversation, skip the gate check and Jira steps entirely. Still update plan progress if a plan file was used this session (see step 7), then run `park -c` and delete extra branches.
 
 ## Output
 
@@ -34,6 +34,7 @@ Narrate every action as it happens. Report what you're checking, what you found,
 ```
 Checking PR #1234 (branch fix-login)... merged ✓
 Transitioning MF-567 to Done... done ✓
+Updating plan scratch/plans/fix-login.md... marked 3 tasks complete ✓
 Running park -c... parked on pl ✓
 Deleting branch add-retry-logic... deleted ✓
 ```
