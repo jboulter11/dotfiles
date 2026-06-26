@@ -7,94 +7,79 @@ Read the given text aloud using the local OpenVox TTS API.
 
 ## Execution
 
-Run this skill in a **background subagent** (`run_in_background: true`) to avoid blocking the conversation. The agent handles the full workflow independently and the user hears the audio without interrupting their flow.
+The server plays audio itself — pass `"play": true` and it streams to the local speakers. No script, no `sox`, no client-side decoding. Just one `curl`.
 
-All commands must run outside the sandbox (`dangerouslyDisableSandbox: true`) since the server is local.
+The server plays audio in its own process, so the request returns *before* playback finishes — the spoken audio keeps going after `curl` exits. The response only takes as long as synthesis (a few seconds for short text, tens of seconds for a long document), not as long as the speech.
+
+Still run the `curl` as a **background Bash command** (`run_in_background: true`) so the synthesis wait doesn't block the conversation, especially for long text. Run it **outside the sandbox** (`dangerouslyDisableSandbox: true`) since the server is local.
+
+**One request per utterance — do NOT fire requests back-to-back.** Playback does not queue: a new request interrupts whatever is currently playing and cuts it off. Since the request returns before playback finishes, sending a second `curl` while the first is still being spoken kills the first mid-sentence. Put everything you want heard into a single request's `input`. (Verified.)
+
+## Speak it
+
+```
+curl -s -X POST http://127.0.0.1:8000/v1/audio/speech \
+  -H "Content-Type: application/json" \
+  -d '{"model":"qwen3-tts-medium","input":"<TEXT>","language":"en","voice":"3F0972FE-C5E8-43D1-9B09-4245F646094F","play":true,"parameters":{"speed":1.5}}' \
+  -o /dev/null
+```
+
+Swap `"model"` to `pocket-tts` for long text (see below). For long text, also build the JSON body with `python3 -c 'import json,sys; ...'` (or write the text to a file and read it in) so quoting/newlines in `<TEXT>` can't break the request.
+
+## Model: short vs long text
+
+Pick the model by how long the audio will be. The dividing line is **~1 minute of speech** — roughly **200 words** at the default 1.5x speed:
+
+- **Short (≲1 min / ≲200 words) → `qwen3-tts-medium`** (default). Best quality, but it breaks down on long input — after a few minutes of continuous speech it degrades and stops producing accurate words. (Verified: the breakdown is the model, not the size tier — `qwen3-tts-large` degrades the same way on a ~5-minute clip, and it's far too slow to synthesize long text anyway.)
+- **Long (≳1 min / ≳200 words) → `pocket-tts`**. Verified coherent on a ~900-word passage with no degradation, and far faster than the large qwen models. Use it for anything past about a minute of speech — a document, a long answer, multiple paragraphs.
+
+When the length is borderline, prefer `pocket-tts` — a slightly lower-quality voice that says every word beats a higher-quality one that disintegrates halfway through. Both use the same Jim voice id and the same request shape; just swap `"model"`.
+
+Bigger qwen variants are **not** a fix for long text: they break down the same way and are much slower, so they don't earn their cost. There's no qwen tier to escalate to — switch to `pocket-tts` instead.
 
 ## Defaults
 
 - **Server**: `http://127.0.0.1:8000/v1`
-- **Model**: `qwen3-tts-medium` (best quality/latency balance; streams incrementally)
-- **Voice**: `3F0972FE-C5E8-43D1-9B09-4245F646094F` (Jim)
+- **Model**: `qwen3-tts-medium` for short text (≲1 min), `pocket-tts` for long text (≳1 min) — see above
+- **Voice**: `3F0972FE-C5E8-43D1-9B09-4245F646094F` (Jim) — present in both models
 - **Language**: `en`
-- **Speed**: `1.5` (sent under `model_parameters`; **currently ignored server-side** — see Notes)
+- **Speed**: `1.5`, sent as `parameters: {speed: 1.5}`
 
-## Preferred: streaming playback (gapless)
-
-Use the bundled `stream_play.py`. It opens an SSE stream, decodes each `audio.chunk`, and feeds raw PCM into a single long-lived `sox` (`play`) process so audio starts within ~1s and plays without gaps. Requires `sox` (`play` on PATH).
-
-```
-python3 ~/src/dotfiles/skills/tts/stream_play.py --text "<TEXT>"
-```
-
-For long text (e.g. a whole document), prefer `--file` or stdin over a huge inline `--text`:
-
-```
-python3 ~/src/dotfiles/skills/tts/stream_play.py --file ~/path/to/notes.md
-echo "<TEXT>" | python3 ~/src/dotfiles/skills/tts/stream_play.py
-```
-
-Flags / overrides:
-- `--text <s>` — speak inline text.
-- `--file <path>` — speak the contents of a file (`~` expanded).
-- `--model <id>` — TTS model id (default `qwen3-tts-medium`).
-- `--voice <name|id>` — voice id, or a name like `Bella`; resolved against the model's voice list (default Jim).
-- `--speed <n>` — speech speed (default 1.5).
-- Source precedence: `--text`, then `--file`, then stdin.
-
-## Fallback: non-streaming (omnivoice)
-
-`omnivoice` has the most voices (294) but does **not** stream — it synthesizes the whole utterance and returns a single chunk, so there's no latency benefit. Use it when a specific omnivoice-only voice is requested, or when `sox` isn't available (play the resulting file with `afplay`).
-
-1. Warm the model (idempotent):
-   ```
-   curl -s -X POST http://127.0.0.1:8000/v1/models/omnivoice/load
-   ```
-2. Generate:
-   ```
-   curl -s -X POST http://127.0.0.1:8000/v1/audio/speech \
-     -H "Content-Type: application/json" \
-     -d '{"model":"omnivoice","input":"<TEXT>","language":"en","voice":"3F0972FE-C5E8-43D1-9B09-4245F646094F","response_format":"wav"}' \
-     -o "$TMPDIR/tts.wav"
-   ```
-3. Play:
-   ```
-   afplay "$TMPDIR/tts.wav"
-   ```
+The user may override any of these — honor explicit overrides. `parameters.speed` is respected server-side (verified: WAV duration scales with the value).
 
 ## Choosing a model
 
-**Default case: do not query the server.** Just use the default (`qwen3-tts-medium`) — pass nothing extra to `stream_play.py`. The model list below is a snapshot for reference only.
+**Default case: do not query the server.** Use `qwen3-tts-medium` (short) or `pocket-tts` (long) per the rule above. The table below is a snapshot for reference only.
 
-**Only if the user explicitly names a model to use**, query the live list to resolve/validate the exact id (the installed set changes as models are added or removed):
+**Only if the user explicitly names a model**, query the live list to resolve/validate the exact id (the installed set changes):
 
 ```
 curl -s http://127.0.0.1:8000/v1/models | python3 -c "import json,sys; [print(m['id'],'| voices',m['voice_count']) for m in json.load(sys.stdin)['data']]"
 ```
 
-Then pass it with `--model <id>` (e.g. `--model qwen3-tts-large`). If the requested model isn't in the list, tell the user and fall back to the default.
+Then pass it as `"model":"<id>"`. If the requested model isn't in the list, tell the user and fall back to the default.
 
-Likewise, if the user names a **voice**, pass `--voice <name>` — the script queries the model's voice list and matches by name or id, so you don't have to look up the id yourself. (To preview the options: `curl -s "http://127.0.0.1:8000/v1/models/<model>/voices?language=en"`.)
+If the user names a **voice**, resolve its id from the model's voice list and pass it as `"voice":"<id>"`:
+
+```
+curl -s "http://127.0.0.1:8000/v1/models/<model>/voices?language=en" | python3 -c "import json,sys; [print(v['id'],'|',v.get('name','?')) for v in json.load(sys.stdin)['data']]"
+```
 
 ## Models (as of last check)
 
-Time-to-first-audio measured on the same passage with the Jim voice:
-
-| Model | Voices | Streams? | TTFA | Notes |
-|---|---|---|---|---|
-| `qwen3-tts-medium` | 149 | ✅ | ~0.80s | **Default** — best quality/latency balance |
-| `qwen3-tts-large` | 149 | ✅ | ~1.58s | Higher quality target, ~2x slower to start |
-| `qwen3-tts-small` | 149 | ✅ | ~0.78s | Fastest qwen, lower quality |
-| `pocket-tts` | 112 | ✅ | ~0.29s | Lowest latency overall |
-| `chatterbox-turbo-large` | 38 | ✅ | ~1.43s | Stochastic (temperature-based) |
-| `omnivoice` | 294 | ❌ single chunk | ~3.26s | Most voices; no streaming benefit |
-| `kokoro` | 54 | advertised | — | Often not installed; verify before use |
+| Model | Voices | Notes |
+|---|---|---|
+| `qwen3-tts-medium` | 149 | **Default for short text (≲1 min)** — best quality, but degrades on long input |
+| `qwen3-tts-large` | 149 | Higher quality but much slower; same long-text breakdown — not a long-text fix |
+| `qwen3-tts-small` | 149 | Fastest qwen, lower quality |
+| `pocket-tts` | 112 | **Default for long text (≳1 min)** — stays coherent over long passages; low latency |
+| `chatterbox-turbo-large` | 38 | Stochastic (temperature-based) |
+| `omnivoice` | 294 | Most voices |
+| `kokoro` | 54 | Often not installed; verify before use |
 
 ## Notes
 
 - If the server is unavailable (connection refused), tell the user local voice output is currently unavailable.
 - If the API returns 429 ("another generation or preload request is already in progress"), wait briefly and retry — only one generation/preload can run at a time.
-- The user may override model, voice, language, or speed — honor any explicit overrides.
-- **Speed is not yet respected server-side.** Verified: output PCM is byte-identical across `speed` 0.5/1.0/3.0 at a constant 24kHz/mono/16-bit, under both `parameters` and `model_parameters` keys, streaming or not. We send `model_parameters.speed` (the key the app uses) anyway so it takes effect once the server fixes it. The server also silently accepts unknown keys (no validation), so a 200 response does not mean a param was applied.
-- For extremely long text (>500 words), consider summarizing or asking whether to read the full text.
-- `omnivoice` returns one chunk regardless of `stream:true` or text length; the others stream incrementally.
+- The first call to a cold model is slower (it loads on demand). To pre-warm: `curl -s -X POST http://127.0.0.1:8000/v1/models/<model>/load -d ""`.
+- Length alone isn't a problem once you're on `pocket-tts` (verified coherent at ~900 words) — switch models rather than truncating. Only for genuinely huge input (many minutes of speech) consider summarizing or asking whether to read the whole thing.

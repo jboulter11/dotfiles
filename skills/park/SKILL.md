@@ -13,7 +13,9 @@ Clean up the current session's work. Run the `park` script with `-c` to park and
 
 1. **Identify session work**: Scan the conversation for branch names worked on and Jira ticket keys (from MF, IOSDBAPP, or ANDROIDDBAPP projects). Also check the PR body (`gh pr view <number> --json body`) for any ticket keys not found in conversation.
 2. **Check PR states**: For each PR, run `gh pr view <number> --json state,number,title,isDraft,statusCheckRollup` to get the PR status. Always use the PR number (not the branch name) — `gh pr view <branch>` does not work reliably.
-3. **Gate check**: If any PR is NOT merged and `-a` was NOT passed, stop immediately. Print each unmerged PR with its number, branch, state (open/draft), and check status. Tell the user to merge first or re-run with `-a` to abandon.
+3. **Gate check**: If any PR is NOT merged and `-a` was NOT passed:
+   - **If the `watch-pr-and-fix` skill is available (xplat repo)**: don't bail. Instead of checking merge state yourself, invoke `/watch-pr-and-fix` for each unmerged PR to watch its CQ build through to terminal state, fixing failures as they arise. Park only proceeds once the watcher reports the PR merged. If the watcher reports the build failed/canceled/errored and it can't land, report that and stop (re-run with `-a` to abandon instead).
+   - **Otherwise**: stop immediately. Print each unmerged PR with its number, branch, state (open/draft), and check status. Tell the user to merge first or re-run with `-a` to abandon.
 4. **Ensure tickets in PR body**: For each merged/open PR, check if the discovered Jira tickets are mentioned in the body. If any are missing, edit the PR body to add them (e.g. append to the Summary section). This keeps the paper trail intact even after context is lost.
 5. **Jira transitions**:
    - If PRs are merged: Transition all mentioned Jira tickets to **Done** (transition ID `91`).
@@ -29,22 +31,23 @@ If no Jira tickets or PRs were mentioned in the conversation, skip the gate chec
 
 ## Output
 
-Narrate every action as it happens. Report what you're checking, what you found, and what you're doing. Example:
+Narrate every action as it happens. Report what you're checking, what you found, and what you're doing. Prefix each line with a status emoji so the summary is easy to scan: ✅ for success/done, ⚠️ for a warning or skipped/no-op step, ❌ for a failure or blocked step. Example:
 
 ```
-Checking PR #1234 (branch fix-login)... merged ✓
-Transitioning MF-567 to Done... done ✓
-Updating plan scratch/plans/fix-login.md... marked 3 tasks complete ✓
-Running park -c... parked on pl ✓
-Deleting branch add-retry-logic... deleted ✓
+✅ Checking PR #1234 (branch fix-login)... merged
+✅ Transitioning MF-567 to Done... done
+✅ Updating plan scratch/plans/fix-login.md... marked 3 tasks complete
+⚠️ No plan file found this session — skipping plan update
+✅ Running park -c... parked on pl
+✅ Deleting branch add-retry-logic... deleted
 ```
 
 ## Gate Check Failure Output
 
-When bailing due to unmerged PRs, include full status details:
+When bailing due to unmerged PRs (and `watch-pr-and-fix` is not available), include full status details:
 
 ```
-Cannot park — unmerged PRs exist:
+❌ Cannot park — unmerged PRs exist:
 
   PR #1234 (branch fix-login)
     State: open (draft)

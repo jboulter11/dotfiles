@@ -4,9 +4,8 @@
 - Always prefer separate tool calls over chaining commands with `&&`, `;`, or `echo "---"`. Run each command as its own Bash call.
 - Always prefer built-in tools (Read, Edit, Write, Glob, Grep) over equivalent Bash commands (cat, sed, find, grep, etc.).
 - Never include `# comments` or unnecessary newlines in Bash commands you are running.  Comments in scripts you're writing are okay.
-- When starting work on any task, immediately:
-  1. Create and check out a descriptive branch name (flat, no prefixes).
-  2. Rename the cmux workspace with `cmux rename-workspace "NAME"` (max 30 chars). If working on a ticket, prefix with the ticket ID, e.g. `[A1] Fix login flow` or `[DASH-456] Add retry`.  Must be run outside the sandbox.
+- As soon as you receive the first prompt of a session, immediately rename the cmux workspace with `cmux rename-workspace "NAME"` (max 30 chars) based on what the prompt is asking for — before doing any other work, planning, or branching. Don't wait for coding to start. If working on a ticket, prefix with the ticket ID, e.g. `[A1] Fix login flow` or `[DASH-456] Add retry`. Must be run outside the sandbox.
+- When starting work on any task, immediately create and check out a descriptive branch name (flat, no prefixes).
 - When a PR is pushed, update the workspace name to include the PR number after any ticket prefix, e.g. `[A1] #12345 Fix login` or `#12345 Fix login flow`.
 - When rebasing a stack of branches (multiple branches stacked on each other), always use `git rebase --update-refs` from the tip of the stack (the topmost branch). This rebases every branch in the chain in one pass, automatically updating intermediate branch refs along the way — including any middle-of-the-stack branches whose tips fall on commits inside the rebase range. Running it from a middle branch only updates refs up to that branch and leaves higher branches untouched, so always start from the tip.
 - Never ever post to github, slack, etc. as me without explicit instructions to do so.  If you do, always include a [AGENT] or [CLAUDE] prefix.
