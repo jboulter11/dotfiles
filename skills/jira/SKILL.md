@@ -49,13 +49,9 @@ Default to "In Progress" when creating a ticket for active work.
 
 ## Keeping Subtasks in Sync
 
-When transitioning a parent issue, keep its subtasks consistent:
+**Whenever you transition a task, always check for subtasks and transition them to match the parent's new status.** Fetch the issue's `subtasks` (include it in the query fields) before transitioning so you know what's beneath it, then apply the same transition to each subtask.
 
-- **Parent → Done:** transition all subtasks to Done (a Done parent cannot have open work items beneath it).
-- **Parent → In Progress:** the subtasks that *are* that work should also be In Progress — don't leave them Open just because no individual one has landed yet.
-- **Auditing existing tickets:** fetch `subtasks` in the query fields and reconcile each subtask against its parent's status, not just the parents.
-
-The same transition IDs apply to subtasks as to parents (71/101/91/41).
+The same transition IDs apply to subtasks as to parents (71/101/91/41). When auditing existing tickets, reconcile each subtask against its parent's status, not just the parents.
 
 ## Workflow
 
