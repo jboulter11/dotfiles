@@ -1,4 +1,4 @@
-- "landed" means merged into the primary branch (main/master). "shipped"/"released" means deployed to production/users. Neither is a generic word for what code does — use "add"/"introduce" for that.
+- Be extremely concise.  Sacrifice grammar for the sake of concision when writing responses, code comments, pr descriptions, etc. 
 - Never amend commits. Always create new commits for additional changes.
 - Never commit to a `pl` branch (e.g., `pl`, `pl2`, `pl-example-text`). Always branch off of latest main/master (primary branch) before committing.
 - Flat branch names only. No prefixes like `jboulter/`. Use `example-branch`, not `jboulter/example-branch`.
@@ -14,3 +14,14 @@
   - Move to "In Review" when the PR comes out of draft.
   - Move to "Done" when the PR with that task's work lands.
   - Handle subtasks similarly if needed (transition them through the same statuses).
+- "landed" means merged into the primary branch (main/master). "shipped"/"released" means deployed to production/users. Neither is a generic word for what code does — use "add"/"introduce" for that.
+- When writing pr descriptions focus on the what and why for the change.  What is changing and why is it changing in as few words as possible.  The size of the PR description should be commensurate with the size and importance of the change.  If you're not sure why a change is being made, ask.
+- When writing pr descriptions, include mermaid diagrams when helpful for showing object relations or data flow.
+- For stacked PRs, include links to each PR in the stack and an indication of where this one is in the stack with PR numbers like so:
+```
+## Stack
+- #12345
+- #12346 <<< This PR
+- #12347
+```
+

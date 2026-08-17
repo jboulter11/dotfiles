@@ -46,6 +46,10 @@
       "sources": "symlinked_to_espanso/*"
     },
     {
+      "dest": "~/.agents/skills",
+      "sources": "skills/*"
+    },
+    {
       "dest": "~/.claude/skills",
       "sources": "skills/*"
     }

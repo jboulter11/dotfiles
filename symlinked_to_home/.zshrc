@@ -45,8 +45,13 @@ alias plc='park --clean'
 export PATH="$(dirname "$(dirname "$(readlink "$HOME/.zshrc")")")/scripts:$PATH"
 source ~/.dropboxrc
 
+# cd + ls, but stay quiet for coding agents (they parse output and don't want the listing)
 function cd {
-    builtin cd "$@" && ls -F
+    if [[ -n "$AI_AGENT$CLAUDECODE$CLAUDE_CODE_ENTRYPOINT$CURSOR_AGENT$CODEX_SANDBOX$GEMINI_CLI$AIDER_CHAT" ]] || [[ ! -o interactive ]]; then
+        builtin cd "$@"
+    else
+        builtin cd "$@" && ls -F
+    fi
 }
 
 [ -f ~/.fzf.zsh ] && source ~/.fzf.zsh
