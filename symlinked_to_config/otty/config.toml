@@ -31,3 +31,4 @@ open-with-app = "Xcode|com.apple.dt.Xcode"
 
 font-family = "BerkeleyMono Nerd Font Mono"
 
+sidebar-width = 364
