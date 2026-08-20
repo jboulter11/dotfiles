@@ -79,3 +79,11 @@ export PATH="$BUN_INSTALL/bin:$PATH"
 
 # Added by git-ai installer on Thu Jun 18 12:42:23 PDT 2026
 export PATH="/Users/jboulter/.git-ai/bin:$PATH"
+
+# >>> otty shell integration >>>
+# Added by Otty — toggle in Settings > Shell > Shell Integration.
+# Inert unless launched by Otty (it sets $OTTY_SHELL_INTEGRATION).
+if [ -n "$OTTY_SHELL_INTEGRATION" ] && [ -r "$OTTY_SHELL_INTEGRATION/otty-integration.zsh" ]; then
+  . "$OTTY_SHELL_INTEGRATION/otty-integration.zsh"
+fi
+# <<< otty shell integration <<<

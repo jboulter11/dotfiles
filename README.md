@@ -6,7 +6,7 @@ Personal macOS development environment setup.
 
 - **Shell**: zsh with [zprezto](https://github.com/sorin-ionescu/prezto) and custom prompt
 - **Editor**: Neovim (kickstart-based config with lazy.nvim)
-- **Terminal**: Ghostty with Monokai theme
+- **Terminal**: Otty and Ghostty with Monokai theme
 - **Packages**: Homebrew formulae and casks via `Brewfile`
 - **macOS**: Screenshot location, Colemak Mod-DH keyboard layout
 - **Themes**: Xcode color themes, Deckset presentation themes
@@ -24,6 +24,10 @@ Run `./setup.sh` for an interactive menu:
 6. Install Colemak Mod-DH keyboard layout
 
 Or select **All** to run everything.
+
+Symlinking can't replace an existing real directory. Apps that create their config
+dir on first launch (e.g. Otty's `~/.config/otty`) must have it removed first, or
+step 3 aborts.
 
 ## File Structure
 
