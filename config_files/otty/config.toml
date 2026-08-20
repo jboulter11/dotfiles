@@ -1,5 +1,5 @@
 # font-blending = "linear" (reset to default)
-theme = "April"
+theme = "Monokai Classic"
 theme-dark = "Monokai Classic"
 foreground = "#fdfff1"
 background = "#272822"
