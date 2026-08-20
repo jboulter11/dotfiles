@@ -25,6 +25,10 @@
       "sources": "config_files/lazygit/*"
     },
     {
+      "dest": "~/.config/otty",
+      "sources": "config_files/otty/*"
+    },
+    {
       "dest": "~/.claude",
       "sources": "config_files/claude/*"
     },

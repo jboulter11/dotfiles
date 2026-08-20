@@ -25,9 +25,10 @@ Run `./setup.sh` for an interactive menu:
 
 Or select **All** to run everything.
 
-Symlinking can't replace an existing real directory. Apps that create their config
-dir on first launch (e.g. Otty's `~/.config/otty`) must have it removed first, or
-step 3 aborts.
+Otty caveat: it rewrites `~/.config/otty/config.toml` atomically, which replaces the
+symlink with a real file. After changing settings in the app, copy that file back over
+`config_files/otty/config.toml` before re-running step 3 — otherwise the re-link
+discards the change.
 
 ## File Structure
 
