@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# Barely-reviewed but seemingly functional slop.
 """Submit a read-only Git comparison as one Kaleidoscope changeset."""
 
 import argparse
