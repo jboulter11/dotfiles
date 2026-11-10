@@ -212,8 +212,6 @@ M.setLspMaps = function(_, bufnr)
   end
 
   -- Symbols
-  nmapLSP("<leader>D", vim.lsp.buf.type_definition, "Type [D]efinition")
-  nmapLSP("gy", vim.lsp.buf.type_definition, "[G]oto t[y]pe definition")
   nmapLSP("<leader>th", function()
     vim.lsp.inlay_hint.enable(not vim.lsp.inlay_hint.is_enabled { bufnr = bufnr }, { bufnr = bufnr })
   end, "[T]oggle inlay [H]ints")
