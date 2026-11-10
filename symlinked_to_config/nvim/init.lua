@@ -52,6 +52,17 @@ local servers = {
   },
 }
 
+vim.api.nvim_create_autocmd("LspAttach", {
+  group = vim.api.nvim_create_augroup("user_lsp_attach", { clear = true }),
+  callback = function(event)
+    local client = vim.lsp.get_client_by_id(event.data.client_id)
+    require("keymaps").setLspMaps(client, event.buf)
+    vim.api.nvim_buf_create_user_command(event.buf, "Format", function()
+      vim.lsp.buf.format()
+    end, { desc = "Format current buffer with LSP" })
+  end,
+})
+
 -- NOTE: Here is where you install your plugins.
 --  You can configure plugins using the `config` key.
 --
@@ -78,7 +89,16 @@ require("lazy").setup({
     dependencies = {
       -- Automatically install LSPs to stdpath for neovim
       { "mason-org/mason.nvim", opts = {} },
-      "neovim/nvim-lspconfig",
+      {
+        "neovim/nvim-lspconfig",
+        dependencies = { "hrsh7th/cmp-nvim-lsp" },
+        config = function()
+          vim.lsp.config("*", {
+            capabilities = require("cmp_nvim_lsp").default_capabilities(),
+          })
+          vim.lsp.enable("sourcekit")
+        end,
+      },
 
       -- Useful status updates for LSP
       -- NOTE: `opts = {}` is the same as calling `require("fidget").setup({})`
@@ -185,7 +205,13 @@ require("lazy").setup({
   },
 
   -- "gc" to comment visual regions/lines
-  { "numToStr/Comment.nvim", opts = {} },
+  {
+    "numToStr/Comment.nvim",
+    opts = {
+      toggler = { line = "gcc", block = "gcbb" },
+      opleader = { line = "gc", block = "gcb" },
+    },
+  },
 
   -- Fuzzy Finder (files, lsp, etc)
   {
@@ -540,21 +566,8 @@ vim.api.nvim_set_hl(0, "WinSeparator", { fg="#D4406A" })
 
 
 -- [[ Configure LSP ]]
---  This function gets run when an LSP connects to a particular buffer.
-local on_attach = function(_, bufnr)
-  require("keymaps").setLspMaps(_, bufnr)
-  -- Create a command `:Format` local to the LSP buffer
-  vim.api.nvim_buf_create_user_command(bufnr, "Format", function(_)
-    vim.lsp.buf.format()
-  end, { desc = "Format current buffer with LSP" })
-end
-
 -- Setup neovim lua configuration
 require("neodev").setup()
-
--- nvim-cmp supports additional completion capabilities, so broadcast that to servers
-local capabilities = vim.lsp.protocol.make_client_capabilities()
-capabilities = require("cmp_nvim_lsp").default_capabilities(capabilities)
 
 -- setup neovim lsps using neovim's builtin syntax
 
@@ -565,12 +578,6 @@ vim.lsp.config.starpls = {
 }
 vim.lsp.enable "starpls"
 
-
-local sourcekit_cmd = vim.fn.system { "xcrun",  "--find", "sourcekit-lsp" }
-sourcekit_cmd = sourcekit_cmd:gsub("\n", "")
-vim.lsp.config.sourcekit = {
-  cmd = { sourcekit_cmd }
-}
 
 -- [[ Configure nvim-cmp ]]
 -- See `:help cmp`

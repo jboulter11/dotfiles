@@ -21,6 +21,10 @@ M.setup = function()
   nmap("k", "v:count == 0 ? 'gk' : 'k'", { expr = true, silent = true })
   nmap("j", "v:count == 0 ? 'gj' : 'j'", { expr = true, silent = true })
 
+  nmap("gb", "<C-o>", { desc = "[G]o [B]ack" })
+  nmap("gf", "<C-i>", { desc = "[G]o [F]orward" })
+  nmap("gF", "gf", { desc = "Go to file under cursor" })
+
   -- [[ Telescope ]]
 
   -- Find recently opened files
