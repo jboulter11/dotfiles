@@ -39,7 +39,8 @@ vim.opt.rtp:prepend(lazypath)
 local servers = {
   -- clangd = {},
   -- gopls = {},
-  -- pyright = {},
+  basedpyright = {}, -- config: after/lsp/basedpyright.lua
+  ruff = {}, -- config: after/lsp/ruff.lua
   -- rust_analyzer = {},
   -- tsserver = {},
   -- html = { filetypes = { "html", "twig", "hbs"} },
