@@ -22,7 +22,7 @@ Clean up the current session's work. Run the `park` script with `-c` to park and
    - If abandoning (`-a`): Transition all mentioned Jira tickets to **Open** (transition ID `61`).
 6. **Close PRs (abandon only)**: If `-a` was passed, close all open/draft PRs with `gh pr close <number>`.
 7. **Update plan progress**: If a plan file was used this session (typically in `scratch/plans/`), mark completed tasks/subtasks with `[x]` in the progress tracking section.
-8. **Park current branch**: Run `park -c` (outside the sandbox — it modifies git state and calls cmux). This parks the worktree, rebases the pl branch, cleans the working branch, and renames the cmux workspace.
+8. **Park current branch**: Run `park -c` (outside the sandbox — it modifies git state). This parks the worktree, rebases the pl branch, and cleans the working branch.
 9. **Delete extra branches**: For any other branches from this worktree that were worked on in the session, run `git branch -D <branch>` to clean them up.
 
 ## No PRs or Tickets
@@ -69,7 +69,7 @@ Merge these PRs first, or re-run with /park -a to abandon.
 
 ## Important Notes
 
-- Always run `park` outside the sandbox (it needs to modify git state and call cmux).
+- Always run `park` outside the sandbox (it needs to modify git state).
 - Always pass `-c` to `park` — the branch is either merged or being abandoned, so clean it up.
 - Only look at Jira tickets explicitly mentioned in the conversation — don't query for linked tickets.
 - Ticket keys can come from any project (MF-*, IOSDBAPP-*, ANDROIDDBAPP-*).
