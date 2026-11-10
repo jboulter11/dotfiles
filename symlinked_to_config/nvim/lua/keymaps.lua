@@ -204,7 +204,12 @@ M.setLspMaps = function(_, bufnr)
   nmapLSP("gd", vim.lsp.buf.definition, "[G]oto [D]efinition")
   nmapLSP("gr", require("telescope.builtin").lsp_references, "[G]oto [R]eferences")
   nmapLSP("gI", vim.lsp.buf.implementation, "[G]oto [I]mplementation")
-  nmapLSP("gD", vim.lsp.buf.declaration, "[G]oto [D]eclaration")
+  if vim.bo[bufnr].filetype == "python" then
+    -- python: declaration == definition, so use gD for the type instead
+    nmapLSP("gD", vim.lsp.buf.type_definition, "[G]oto type [D]efinition")
+  else
+    nmapLSP("gD", vim.lsp.buf.declaration, "[G]oto [D]eclaration")
+  end
 
   -- Symbols
   nmapLSP("<leader>D", vim.lsp.buf.type_definition, "Type [D]efinition")
