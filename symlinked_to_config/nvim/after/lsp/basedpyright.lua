@@ -6,6 +6,9 @@ return {
       config.settings.python = vim.tbl_extend("force", config.settings.python or {}, { pythonPath = py })
     end
   end,
+  on_attach = function(_, bufnr)
+    vim.lsp.inlay_hint.enable(true, { bufnr = bufnr }) -- inline inferred types; toggle <leader>th
+  end,
   settings = {
     basedpyright = {
       -- ruff handles imports/lint
@@ -15,6 +18,12 @@ return {
         diagnosticMode = "openFilesOnly",
         autoSearchPaths = true,
         useLibraryCodeForTypes = true,
+        inlayHints = {
+          variableTypes = true,
+          callArgumentNames = true,
+          functionReturnTypes = true,
+          genericTypes = false,
+        },
         -- mirror xplat.code-workspace python.analysis.exclude
         exclude = {
           ".venv",
