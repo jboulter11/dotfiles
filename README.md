@@ -6,7 +6,7 @@ Personal macOS development environment setup.
 
 - **Shell**: zsh with [zprezto](https://github.com/sorin-ionescu/prezto) and custom prompt
 - **Editor**: Neovim (kickstart-based config with lazy.nvim)
-- **Terminal**: Otty and Ghostty with Monokai theme
+- **Terminal**: Ghostty with Monokai theme
 - **Packages**: Homebrew formulae and casks via `Brewfile`
 - **macOS**: Screenshot location, Colemak Mod-DH keyboard layout
 - **Themes**: Xcode color themes, Deckset presentation themes
@@ -24,11 +24,6 @@ Run `./setup.sh` for an interactive menu:
 6. Install Colemak Mod-DH keyboard layout
 
 Or select **All** to run everything.
-
-Otty caveat: it rewrites `~/.config/otty/config.toml` atomically, which replaces the
-symlink with a real file. After changing settings in the app, copy that file back over
-`config_files/otty/config.toml` before re-running step 3 — otherwise the re-link
-discards the change.
 
 ## File Structure
 
