@@ -4,5 +4,5 @@
 
 Overrides global branch/PR rules for this repo.
 
-- Small changes: commit directly to `main` and push. No branch, no PR.
+- Small changes: work directly on main, no branches or PRs needed.
 - Experimental changes: branch + PR.
