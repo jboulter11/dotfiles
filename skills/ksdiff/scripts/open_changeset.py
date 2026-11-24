@@ -26,6 +26,7 @@ def parse_arguments():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--repo", required=True)
     parser.add_argument("--ksdiff", default="ksdiff", help="ksdiff executable")
+    parser.add_argument("--label", help="changeset tab name (default: repo + endpoints)")
 
     modes = parser.add_subparsers(dest="mode", required=True)
 
@@ -174,8 +175,19 @@ def main():
     # Snapshot every file before launching UI. Unsupported entries should fail
     # before Kaleidoscope opens a partial review. Retain snapshots for the user.
     artifacts = Path(tempfile.mkdtemp(prefix="ksdiff-changeset-"))
+    def short(source):
+        return source if source in ("index", "worktree") else source[:10]
+
+    # Without --label, Kaleidoscope names the tab after ksdiff's parent process.
+    label = args.label or "{}: {} → {}{}".format(
+        repo.name,
+        short(left),
+        short(right),
+        " (" + " ".join(args.paths) + ")" if args.paths else "",
+    )
     manifest = {
         "repo": str(repo),
+        "label": label,
         "left": left,
         "right": right,
         "uuid": str(uuid.uuid4()),
@@ -212,6 +224,7 @@ def main():
                     executable,
                     "--partial-changeset",
                     "--UUID", manifest["uuid"],
+                    "--label", label,
                     "--relative-path", entry["path"],
                     entry["before"], entry["after"],
                 ],
